@@ -1,0 +1,12 @@
+{
+	"name": "LS_HTTP_OpenDataEuskadi",
+	"properties": {
+		"annotations": [],
+		"type": "HttpServer",
+		"typeProperties": {
+			"url": "https://opendata.euskadi.eus",
+			"enableServerCertificateValidation": true,
+			"authenticationType": "Anonymous"
+		}
+	}
+}
