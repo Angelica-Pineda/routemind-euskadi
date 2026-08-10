@@ -1,0 +1,10 @@
+{
+	"name": "LS_ADLS_Bronze",
+	"properties": {
+		"annotations": [],
+		"type": "AzureBlobFS",
+		"typeProperties": {
+			"url": "https://stroutemindeuskadidev.dfs.core.windows.net/"
+		}
+	}
+}
