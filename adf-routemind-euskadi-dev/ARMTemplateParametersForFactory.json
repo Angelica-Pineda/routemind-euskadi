@@ -1,0 +1,15 @@
+{
+	"$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
+	"contentVersion": "1.0.0.0",
+	"parameters": {
+		"factoryName": {
+			"value": "adf-routemind-euskadi-dev"
+		},
+		"LS_HTTP_OpenDataEuskadi_properties_typeProperties_url": {
+			"value": "https://opendata.euskadi.eus"
+		},
+		"LS_ADLS_Bronze_properties_typeProperties_url": {
+			"value": "https://stroutemindeuskadidev.dfs.core.windows.net/"
+		}
+	}
+}
