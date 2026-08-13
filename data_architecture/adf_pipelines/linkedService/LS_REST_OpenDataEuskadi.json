@@ -1,0 +1,12 @@
+{
+	"name": "LS_REST_OpenDataEuskadi",
+	"properties": {
+		"annotations": [],
+		"type": "RestService",
+		"typeProperties": {
+			"url": "api.euskadi.eus/culture/events",
+			"enableServerCertificateValidation": true,
+			"authenticationType": "Anonymous"
+		}
+	}
+}
