@@ -1,16 +1,27 @@
 {
-	"name": "DS_HTTP_EstacionesMeteorologicas",
+	"name": "ds_http_flatfiles",
 	"properties": {
 		"linkedServiceName": {
 			"referenceName": "LS_HTTP_OpenDataEuskadi",
 			"type": "LinkedServiceReference"
+		},
+		"parameters": {
+			"url_data": {
+				"type": "string"
+			}
+		},
+		"folder": {
+			"name": "Source"
 		},
 		"annotations": [],
 		"type": "Json",
 		"typeProperties": {
 			"location": {
 				"type": "HttpServerLocation",
-				"relativeUrl": "/contenidos/ds_meteorologicos/estaciones_meteorologicas/opendata/estaciones.json"
+				"relativeUrl": {
+					"value": "@dataset().url_data",
+					"type": "Expression"
+				}
 			}
 		},
 		"schema": {}

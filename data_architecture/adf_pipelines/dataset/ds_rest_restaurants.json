@@ -1,0 +1,15 @@
+{
+	"name": "ds_rest_restaurants",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "LS_REST_OpenDataEuskadi",
+			"type": "LinkedServiceReference"
+		},
+		"folder": {
+			"name": "Source"
+		},
+		"annotations": [],
+		"type": "RestResource",
+		"schema": []
+	}
+}

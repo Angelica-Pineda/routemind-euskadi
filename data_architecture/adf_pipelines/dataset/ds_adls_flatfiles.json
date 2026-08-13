@@ -1,16 +1,23 @@
 {
-	"name": "DS_ADLS_EstacionesMeteorologicas",
+	"name": "ds_adls_flatfiles",
 	"properties": {
 		"linkedServiceName": {
 			"referenceName": "LS_ADLS_Bronze",
 			"type": "LinkedServiceReference"
+		},
+		"parameters": {
+			"path": {
+				"type": "string"
+			}
+		},
+		"folder": {
+			"name": "Target"
 		},
 		"annotations": [],
 		"type": "Json",
 		"typeProperties": {
 			"location": {
 				"type": "AzureBlobFSLocation",
-				"folderPath": "weather/stations",
 				"fileSystem": "bronze"
 			}
 		},
