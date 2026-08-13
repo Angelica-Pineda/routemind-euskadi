@@ -10,6 +10,9 @@
 		},
 		"LS_ADLS_Bronze_properties_typeProperties_url": {
 			"value": "https://stroutemindeuskadidev.dfs.core.windows.net/"
+		},
+		"LS_REST_OpenDataEuskadi_properties_typeProperties_url": {
+			"value": "https://api.euskadi.eus"
 		}
 	}
 }
