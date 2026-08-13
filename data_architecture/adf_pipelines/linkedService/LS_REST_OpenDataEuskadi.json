@@ -4,7 +4,7 @@
 		"annotations": [],
 		"type": "RestService",
 		"typeProperties": {
-			"url": "api.euskadi.eus/culture/events",
+			"url": "https://api.euskadi.eus",
 			"enableServerCertificateValidation": true,
 			"authenticationType": "Anonymous"
 		}
