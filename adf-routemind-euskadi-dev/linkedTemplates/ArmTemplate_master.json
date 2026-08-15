@@ -7,13 +7,13 @@
 			"metadata": "Data Factory name",
 			"defaultValue": "adf-routemind-euskadi-dev"
 		},
-		"LS_HTTP_OpenDataEuskadi_properties_typeProperties_url": {
-			"type": "string",
-			"defaultValue": "https://opendata.euskadi.eus"
-		},
 		"LS_ADLS_Bronze_properties_typeProperties_url": {
 			"type": "string",
 			"defaultValue": "https://stroutemindeuskadidev.dfs.core.windows.net/"
+		},
+		"LS_HTTP_OpenDataEuskadi_properties_typeProperties_url": {
+			"type": "string",
+			"defaultValue": "https://opendata.euskadi.eus"
 		},
 		"LS_REST_OpenDataEuskadi_properties_typeProperties_url": {
 			"type": "string",
@@ -46,11 +46,11 @@
 					"factoryName": {
 						"value": "[parameters('factoryName')]"
 					},
-					"LS_HTTP_OpenDataEuskadi_properties_typeProperties_url": {
-						"value": "[parameters('LS_HTTP_OpenDataEuskadi_properties_typeProperties_url')]"
-					},
 					"LS_ADLS_Bronze_properties_typeProperties_url": {
 						"value": "[parameters('LS_ADLS_Bronze_properties_typeProperties_url')]"
+					},
+					"LS_HTTP_OpenDataEuskadi_properties_typeProperties_url": {
+						"value": "[parameters('LS_HTTP_OpenDataEuskadi_properties_typeProperties_url')]"
 					},
 					"LS_REST_OpenDataEuskadi_properties_typeProperties_url": {
 						"value": "[parameters('LS_REST_OpenDataEuskadi_properties_typeProperties_url')]"

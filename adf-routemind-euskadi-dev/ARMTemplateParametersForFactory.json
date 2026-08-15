@@ -5,11 +5,11 @@
 		"factoryName": {
 			"value": "adf-routemind-euskadi-dev"
 		},
-		"LS_HTTP_OpenDataEuskadi_properties_typeProperties_url": {
-			"value": "https://opendata.euskadi.eus"
-		},
 		"LS_ADLS_Bronze_properties_typeProperties_url": {
 			"value": "https://stroutemindeuskadidev.dfs.core.windows.net/"
+		},
+		"LS_HTTP_OpenDataEuskadi_properties_typeProperties_url": {
+			"value": "https://opendata.euskadi.eus"
 		},
 		"LS_REST_OpenDataEuskadi_properties_typeProperties_url": {
 			"value": "https://api.euskadi.eus"

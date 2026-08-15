@@ -7,13 +7,13 @@
 			"metadata": "Data Factory name",
 			"defaultValue": "adf-routemind-euskadi-dev"
 		},
-		"LS_HTTP_OpenDataEuskadi_properties_typeProperties_url": {
-			"type": "string",
-			"defaultValue": "https://opendata.euskadi.eus"
-		},
 		"LS_ADLS_Bronze_properties_typeProperties_url": {
 			"type": "string",
 			"defaultValue": "https://stroutemindeuskadidev.dfs.core.windows.net/"
+		},
+		"LS_HTTP_OpenDataEuskadi_properties_typeProperties_url": {
+			"type": "string",
+			"defaultValue": "https://opendata.euskadi.eus"
 		},
 		"LS_REST_OpenDataEuskadi_properties_typeProperties_url": {
 			"type": "string",
@@ -25,6 +25,19 @@
 	},
 	"resources": [
 		{
+			"name": "[concat(parameters('factoryName'), '/LS_ADLS_Bronze')]",
+			"type": "Microsoft.DataFactory/factories/linkedServices",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"annotations": [],
+				"type": "AzureBlobFS",
+				"typeProperties": {
+					"url": "[parameters('LS_ADLS_Bronze_properties_typeProperties_url')]"
+				}
+			},
+			"dependsOn": []
+		},
+		{
 			"name": "[concat(parameters('factoryName'), '/LS_HTTP_OpenDataEuskadi')]",
 			"type": "Microsoft.DataFactory/factories/linkedServices",
 			"apiVersion": "2018-06-01",
@@ -35,19 +48,6 @@
 					"url": "[parameters('LS_HTTP_OpenDataEuskadi_properties_typeProperties_url')]",
 					"enableServerCertificateValidation": true,
 					"authenticationType": "Anonymous"
-				}
-			},
-			"dependsOn": []
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/LS_ADLS_Bronze')]",
-			"type": "Microsoft.DataFactory/factories/linkedServices",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"annotations": [],
-				"type": "AzureBlobFS",
-				"typeProperties": {
-					"url": "[parameters('LS_ADLS_Bronze_properties_typeProperties_url')]"
 				}
 			},
 			"dependsOn": []
@@ -66,6 +66,48 @@
 				}
 			},
 			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/ds_adls_flatfiles')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "LS_ADLS_Bronze",
+					"type": "LinkedServiceReference"
+				},
+				"parameters": {
+					"path": {
+						"type": "string"
+					},
+					"filename": {
+						"type": "string"
+					}
+				},
+				"folder": {
+					"name": "Target"
+				},
+				"annotations": [],
+				"type": "Json",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobFSLocation",
+						"fileName": {
+							"value": "@dataset().filename",
+							"type": "Expression"
+						},
+						"folderPath": {
+							"value": "@dataset().path",
+							"type": "Expression"
+						},
+						"fileSystem": "bronze"
+					}
+				},
+				"schema": {}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/LS_ADLS_Bronze')]"
+			]
 		},
 		{
 			"name": "[concat(parameters('factoryName'), '/ds_http_flatfiles')]",
@@ -102,38 +144,7 @@
 			]
 		},
 		{
-			"name": "[concat(parameters('factoryName'), '/ds_adls_flatfiles')]",
-			"type": "Microsoft.DataFactory/factories/datasets",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"linkedServiceName": {
-					"referenceName": "LS_ADLS_Bronze",
-					"type": "LinkedServiceReference"
-				},
-				"parameters": {
-					"path": {
-						"type": "string"
-					}
-				},
-				"folder": {
-					"name": "Target"
-				},
-				"annotations": [],
-				"type": "Json",
-				"typeProperties": {
-					"location": {
-						"type": "AzureBlobFSLocation",
-						"fileSystem": "bronze"
-					}
-				},
-				"schema": {}
-			},
-			"dependsOn": [
-				"[concat(variables('factoryId'), '/linkedServices/LS_ADLS_Bronze')]"
-			]
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/ds_rest_restaurants')]",
+			"name": "[concat(parameters('factoryName'), '/ds_rest_cultural_events')]",
 			"type": "Microsoft.DataFactory/factories/datasets",
 			"apiVersion": "2018-06-01",
 			"properties": {
@@ -141,12 +152,25 @@
 					"referenceName": "LS_REST_OpenDataEuskadi",
 					"type": "LinkedServiceReference"
 				},
+				"parameters": {
+					"year_month": {
+						"type": "string"
+					},
+					"pagenum": {
+						"type": "string"
+					}
+				},
 				"folder": {
 					"name": "Source"
 				},
 				"annotations": [],
 				"type": "RestResource",
-				"typeProperties": {},
+				"typeProperties": {
+					"relativeUrl": {
+						"value": "@concat('culture/events/v1.0/events/byMonth/',dataset().year_month,'?_elements=500&_page=',dataset().pagenum)",
+						"type": "Expression"
+					}
+				},
 				"schema": []
 			},
 			"dependsOn": [
@@ -154,72 +178,162 @@
 			]
 		},
 		{
-			"name": "[concat(parameters('factoryName'), '/pl_ingestion_one_time_load_weather_station')]",
+			"name": "[concat(parameters('factoryName'), '/pl_api_paging')]",
 			"type": "Microsoft.DataFactory/factories/pipelines",
 			"apiVersion": "2018-06-01",
 			"properties": {
 				"activities": [
 					{
-						"name": "Copy data1",
-						"type": "Copy",
+						"name": "Until1",
+						"type": "Until",
 						"dependsOn": [],
-						"policy": {
-							"timeout": "0.12:00:00",
-							"retry": 0,
-							"retryIntervalInSeconds": 30,
-							"secureOutput": false,
-							"secureInput": false
-						},
 						"userProperties": [],
 						"typeProperties": {
-							"source": {
-								"type": "JsonSource",
-								"storeSettings": {
-									"type": "HttpReadSettings",
-									"requestMethod": "GET"
-								},
-								"formatSettings": {
-									"type": "JsonReadSettings"
-								}
+							"expression": {
+								"value": "@greater(variables('current_page'), pipeline().parameters.total_pages)",
+								"type": "Expression"
 							},
-							"sink": {
-								"type": "JsonSink",
-								"storeSettings": {
-									"type": "AzureBlobFSWriteSettings"
+							"activities": [
+								{
+									"name": "Copy data1",
+									"type": "Copy",
+									"dependsOn": [],
+									"policy": {
+										"timeout": "0.12:00:00",
+										"retry": 0,
+										"retryIntervalInSeconds": 30,
+										"secureOutput": false,
+										"secureInput": false
+									},
+									"userProperties": [],
+									"typeProperties": {
+										"source": {
+											"type": "RestSource",
+											"httpRequestTimeout": "00:01:40",
+											"requestInterval": "00.00:00:00.010",
+											"requestMethod": "GET"
+										},
+										"sink": {
+											"type": "JsonSink",
+											"storeSettings": {
+												"type": "AzureBlobFSWriteSettings"
+											},
+											"formatSettings": {
+												"type": "JsonWriteSettings"
+											}
+										},
+										"enableStaging": false
+									},
+									"inputs": [
+										{
+											"referenceName": "ds_rest_cultural_events",
+											"type": "DatasetReference",
+											"parameters": {
+												"year_month": {
+													"value": "@pipeline().parameters.year_month",
+													"type": "Expression"
+												},
+												"pagenum": {
+													"value": "@string(variables('current_page'))",
+													"type": "Expression"
+												}
+											}
+										}
+									],
+									"outputs": [
+										{
+											"referenceName": "ds_adls_flatfiles",
+											"type": "DatasetReference",
+											"parameters": {
+												"path": {
+													"value": "/events/@{pipeline().parameters.year_month}",
+													"type": "Expression"
+												},
+												"filename": {
+													"value": "page_@{variables('current_page')}.json",
+													"type": "Expression"
+												}
+											}
+										}
+									]
 								},
-								"formatSettings": {
-									"type": "JsonWriteSettings"
+								{
+									"name": "Set variable1",
+									"type": "SetVariable",
+									"dependsOn": [
+										{
+											"activity": "Copy data1",
+											"dependencyConditions": [
+												"Succeeded"
+											]
+										}
+									],
+									"policy": {
+										"secureOutput": false,
+										"secureInput": false
+									},
+									"userProperties": [],
+									"typeProperties": {
+										"variableName": "temp_current_page",
+										"value": {
+											"value": "@add(int(variables('current_page')),1)",
+											"type": "Expression"
+										}
+									}
+								},
+								{
+									"name": "Set variable2",
+									"type": "SetVariable",
+									"dependsOn": [
+										{
+											"activity": "Set variable1",
+											"dependencyConditions": [
+												"Succeeded"
+											]
+										}
+									],
+									"policy": {
+										"secureOutput": false,
+										"secureInput": false
+									},
+									"userProperties": [],
+									"typeProperties": {
+										"variableName": "current_page",
+										"value": {
+											"value": "@variables('temp_current_page')",
+											"type": "Expression"
+										}
+									}
 								}
-							},
-							"enableStaging": false
-						},
-						"inputs": [
-							{
-								"referenceName": "ds_http_flatfiles",
-								"type": "DatasetReference",
-								"parameters": {
-									"url_data": "/contenidos/ds_meteorologicos/estaciones_meteorologicas/opendata/estaciones.json"
-								}
-							}
-						],
-						"outputs": [
-							{
-								"referenceName": "ds_adls_flatfiles",
-								"type": "DatasetReference",
-								"parameters": {
-									"path": "weather/stations"
-								}
-							}
-						]
+							],
+							"timeout": "0.12:00:00"
+						}
 					}
 				],
 				"policy": {
 					"elapsedTimeMetric": {}
 				},
+				"parameters": {
+					"year_month": {
+						"type": "string"
+					},
+					"total_pages": {
+						"type": "int"
+					}
+				},
+				"variables": {
+					"current_page": {
+						"type": "Integer",
+						"defaultValue": 1
+					},
+					"temp_current_page": {
+						"type": "Integer"
+					}
+				},
 				"annotations": []
 			},
 			"dependsOn": [
-				"[concat(variables('factoryId'), '/datasets/ds_http_flatfiles')]",
+				"[concat(variables('factoryId'), '/datasets/ds_rest_cultural_events')]",
 				"[concat(variables('factoryId'), '/datasets/ds_adls_flatfiles')]"
 			]
 		},
@@ -277,7 +391,8 @@
 								"referenceName": "ds_adls_flatfiles",
 								"type": "DatasetReference",
 								"parameters": {
-									"path": "restaurants"
+									"path": "restaurants",
+									"filename": "restaurants.json"
 								}
 							}
 						]
@@ -291,6 +406,172 @@
 			"dependsOn": [
 				"[concat(variables('factoryId'), '/datasets/ds_http_flatfiles')]",
 				"[concat(variables('factoryId'), '/datasets/ds_adls_flatfiles')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/pl_ingestion_one_time_load_weather_station')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"activities": [
+					{
+						"name": "Copy data1",
+						"type": "Copy",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "JsonSource",
+								"storeSettings": {
+									"type": "HttpReadSettings",
+									"requestMethod": "GET"
+								},
+								"formatSettings": {
+									"type": "JsonReadSettings"
+								}
+							},
+							"sink": {
+								"type": "JsonSink",
+								"storeSettings": {
+									"type": "AzureBlobFSWriteSettings"
+								},
+								"formatSettings": {
+									"type": "JsonWriteSettings"
+								}
+							},
+							"enableStaging": false
+						},
+						"inputs": [
+							{
+								"referenceName": "ds_http_flatfiles",
+								"type": "DatasetReference",
+								"parameters": {
+									"url_data": "/contenidos/ds_meteorologicos/estaciones_meteorologicas/opendata/estaciones.json"
+								}
+							}
+						],
+						"outputs": [
+							{
+								"referenceName": "ds_adls_flatfiles",
+								"type": "DatasetReference",
+								"parameters": {
+									"path": "weather/stations",
+									"filename": "weather_stations.json"
+								}
+							}
+						]
+					}
+				],
+				"policy": {
+					"elapsedTimeMetric": {}
+				},
+				"annotations": []
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/datasets/ds_http_flatfiles')]",
+				"[concat(variables('factoryId'), '/datasets/ds_adls_flatfiles')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/pl_ingestion_daily_api_cultural_events')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"activities": [
+					{
+						"name": "ForEach month",
+						"type": "ForEach",
+						"dependsOn": [],
+						"userProperties": [],
+						"typeProperties": {
+							"items": {
+								"value": "@variables('array_month')",
+								"type": "Expression"
+							},
+							"isSequential": true,
+							"activities": [
+								{
+									"name": "Web_getMetadata",
+									"type": "WebActivity",
+									"dependsOn": [],
+									"policy": {
+										"timeout": "0.12:00:00",
+										"retry": 0,
+										"retryIntervalInSeconds": 30,
+										"secureOutput": false,
+										"secureInput": false
+									},
+									"userProperties": [],
+									"typeProperties": {
+										"method": "GET",
+										"headers": {},
+										"url": {
+											"value": "@concat('https://api.euskadi.eus/culture/events/v1.0/events/byMonth/', formatDateTime(addToTime(utcNow(), int(item()), 'Month'), 'yyyy/M'), '?_elements=500&_page=1')",
+											"type": "Expression"
+										}
+									}
+								},
+								{
+									"name": "Execute Paging Pipeline",
+									"type": "ExecutePipeline",
+									"dependsOn": [
+										{
+											"activity": "Web_getMetadata",
+											"dependencyConditions": [
+												"Succeeded"
+											]
+										}
+									],
+									"policy": {
+										"secureInput": false
+									},
+									"userProperties": [],
+									"typeProperties": {
+										"pipeline": {
+											"referenceName": "pl_api_paging",
+											"type": "PipelineReference"
+										},
+										"waitOnCompletion": true,
+										"parameters": {
+											"year_month": {
+												"value": "@formatDateTime(addToTime(utcNow(), int(item()), 'Month'), 'yyyy/M')",
+												"type": "Expression"
+											},
+											"total_pages": {
+												"value": "@int(activity('Web_getMetadata').output.totalPages)",
+												"type": "Expression"
+											}
+										}
+									}
+								}
+							]
+						}
+					}
+				],
+				"policy": {
+					"elapsedTimeMetric": {}
+				},
+				"variables": {
+					"array_month": {
+						"type": "Array",
+						"defaultValue": [
+							0,
+							1,
+							2
+						]
+					}
+				},
+				"annotations": []
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/pipelines/pl_api_paging')]"
 			]
 		}
 	]
