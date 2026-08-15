@@ -1,15 +1,29 @@
 {
-	"name": "ds_rest_restaurants",
+	"name": "ds_rest_cultural_events",
 	"properties": {
 		"linkedServiceName": {
 			"referenceName": "LS_REST_OpenDataEuskadi",
 			"type": "LinkedServiceReference"
+		},
+		"parameters": {
+			"year_month": {
+				"type": "string"
+			},
+			"pagenum": {
+				"type": "string"
+			}
 		},
 		"folder": {
 			"name": "Source"
 		},
 		"annotations": [],
 		"type": "RestResource",
+		"typeProperties": {
+			"relativeUrl": {
+				"value": "@concat('culture/events/v1.0/events/byMonth/',dataset().year_month,'?_elements=500&_page=',dataset().pagenum)",
+				"type": "Expression"
+			}
+		},
 		"schema": []
 	}
 }

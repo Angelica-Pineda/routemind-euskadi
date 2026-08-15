@@ -1,0 +1,86 @@
+{
+	"name": "pl_ingestion_daily_api_cultural_events",
+	"properties": {
+		"activities": [
+			{
+				"name": "ForEach month",
+				"type": "ForEach",
+				"dependsOn": [],
+				"userProperties": [],
+				"typeProperties": {
+					"items": {
+						"value": "@variables('array_month')",
+						"type": "Expression"
+					},
+					"isSequential": true,
+					"activities": [
+						{
+							"name": "Web_getMetadata",
+							"type": "WebActivity",
+							"dependsOn": [],
+							"policy": {
+								"timeout": "0.12:00:00",
+								"retry": 0,
+								"retryIntervalInSeconds": 30,
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"method": "GET",
+								"url": {
+									"value": "@concat('https://api.euskadi.eus/culture/events/v1.0/events/byMonth/', formatDateTime(addToTime(utcNow(), int(item()), 'Month'), 'yyyy/M'), '?_elements=500&_page=1')",
+									"type": "Expression"
+								}
+							}
+						},
+						{
+							"name": "Execute Paging Pipeline",
+							"type": "ExecutePipeline",
+							"dependsOn": [
+								{
+									"activity": "Web_getMetadata",
+									"dependencyConditions": [
+										"Succeeded"
+									]
+								}
+							],
+							"policy": {
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"pipeline": {
+									"referenceName": "pl_api_paging",
+									"type": "PipelineReference"
+								},
+								"waitOnCompletion": true,
+								"parameters": {
+									"year_month": {
+										"value": "@formatDateTime(addToTime(utcNow(), int(item()), 'Month'), 'yyyy/M')",
+										"type": "Expression"
+									},
+									"total_pages": {
+										"value": "@int(activity('Web_getMetadata').output.totalPages)",
+										"type": "Expression"
+									}
+								}
+							}
+						}
+					]
+				}
+			}
+		],
+		"variables": {
+			"array_month": {
+				"type": "Array",
+				"defaultValue": [
+					0,
+					1,
+					2
+				]
+			}
+		},
+		"annotations": []
+	}
+}

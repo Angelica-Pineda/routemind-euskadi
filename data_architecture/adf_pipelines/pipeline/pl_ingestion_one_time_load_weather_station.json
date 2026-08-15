@@ -50,7 +50,8 @@
 						"referenceName": "ds_adls_flatfiles",
 						"type": "DatasetReference",
 						"parameters": {
-							"path": "weather/stations"
+							"path": "weather/stations",
+							"filename": "weather_stations.json"
 						}
 					}
 				]
