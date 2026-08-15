@@ -1,16 +1,31 @@
-# React + Vite
+# RouteMind Euskadi
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Aplicacion React + Vite preparada para desplegar en Vercel con backend interno en `api/`, consulta a MongoDB y generacion de itinerarios con Gemini.
 
-Currently, two official plugins are available:
+## Estructura
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+- `src/` contiene la interfaz de usuario.
+- `api/` expone `GET /api/health` y `POST /api/itinerary`.
+- `shared/catalog.js` centraliza el catalogo base para frontend y backend.
 
-## React Compiler
+## Variables de entorno
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+Crea un archivo `.env` a partir de `.env.example` y completa los valores de MongoDB y Gemini.
 
-## Expanding the ESLint configuration
+## Desarrollo
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+```bash
+npm install
+npm run dev
+```
+
+## Build
+
+```bash
+npm run build
+```
+
+## Notas
+
+- El frontend envia el formulario a `/api/itinerary`.
+- Si no hay `MONGODB_URI` o `GEMINI_API_KEY`, la API usa el catalogo de reserva para mantener el flujo funcional.
