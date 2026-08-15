@@ -1,4 +1,4 @@
-import { eventOptions, getCatalogSeed, getSitesByIds, paceOptions, preferenceOptions, siteOptions, transportOptions } from '../../shared/catalog.js'
+import { eventOptions, getCatalogSeed, getSitesByIds, getZoneById, paceOptions, preferenceOptions, siteOptions, transportOptions, zoneOptions } from '../../shared/catalog.js'
 import { fetchCatalogSnapshot } from './mongo.js'
 import { generateItineraryWithGemini } from './gemini.js'
 
@@ -66,6 +66,7 @@ export function normalizeTripRequest(input = {}) {
   return {
     startDate: String(input.startDate ?? input.from ?? ''),
     endDate: String(input.endDate ?? input.to ?? ''),
+    zone: normalizeString(input.zone ?? input.area ?? 'bilbao-metro', 'bilbao-metro'),
     preference: normalizeString(input.preference ?? input.planPreference ?? 'indiferente', 'indiferente'),
     transport: normalizeString(input.transport ?? input.transportMode ?? 'publico', 'publico'),
     pace: normalizeString(input.pace ?? input.tripPace ?? 'equilibrado', 'equilibrado'),
@@ -113,6 +114,10 @@ export function validateTripRequest(request) {
     errors.push('La preferencia de plan no es valida.')
   }
 
+  if (request.zone && !zoneOptions.some((item) => item.id === request.zone)) {
+    errors.push('La zona elegida no es valida.')
+  }
+
   if (request.transport && !transportOptions.some((item) => item.value === request.transport)) {
     errors.push('El tipo de transporte no es valido.')
   }
@@ -126,9 +131,24 @@ export function validateTripRequest(request) {
 
 function scoreItem(item, request) {
   let score = Number(item.priority ?? 70)
+  const selectedZone = getZoneById(request.zone)
 
   if (request.sites.includes(item.id)) {
     score += 60
+  }
+
+  if (selectedZone) {
+    if (Array.isArray(selectedZone.siteIds) && selectedZone.siteIds.includes(item.id)) {
+      score += 40
+    }
+
+    if (selectedZone.province === item.province) {
+      score += 20
+    }
+
+    if (Array.isArray(selectedZone.cities) && selectedZone.cities.includes(item.city)) {
+      score += 15
+    }
   }
 
   if (request.preference !== 'indiferente') {
@@ -258,6 +278,7 @@ function buildPackingTips(request) {
 }
 
 function buildFallbackItinerary(request, catalog) {
+  const selectedZone = getZoneById(request.zone) ?? zoneOptions[0]
   const rankedPlaces = rankItems(catalog.places.length ? catalog.places : siteOptions, request)
   const rankedEvents = rankItems(catalog.events.length ? catalog.events : eventOptions, request)
   const primaryAnchors = rankedPlaces.slice(0, 6)
@@ -273,7 +294,7 @@ function buildFallbackItinerary(request, catalog) {
   const days = getTripDays(request)
 
   return {
-    title: `Itinerario inteligente para ${days.length} dias en Euskadi`,
+    title: `Itinerario inteligente para ${selectedZone?.label ?? 'Euskadi'} y ${days.length} dias`,
     summary:
       request.preference === 'indoor'
         ? 'Predomina la capa cultural indoor, con escapadas cortas y control de traslados.'
@@ -294,6 +315,7 @@ function buildFallbackItinerary(request, catalog) {
     ],
     sources: {
       catalogSource: catalog.source,
+      selectedZone: selectedZone?.label ?? 'Todo Euskadi',
       selectedSites: getSitesByIds(request.sites).map((site) => site.label),
       rankedEvents: rankedEvents.slice(0, 3).map((event) => event.label),
     },
@@ -369,6 +391,7 @@ function normalizeGeminiPlan(parsedPlan, fallbackPlan) {
 export async function planTrip(input = {}) {
   const request = normalizeTripRequest(input)
   const errors = validateTripRequest(request)
+  const selectedZone = getZoneById(request.zone) ?? zoneOptions[0]
 
   if (errors.length) {
     const error = new Error(errors[0])
@@ -394,6 +417,7 @@ export async function planTrip(input = {}) {
       places: catalog.places.slice(0, 12),
       events: catalog.events.slice(0, 8),
       weather: catalog.weather.slice(0, 6),
+      selectedZone,
     },
     suggestedRankings: {
       places: rankItems(catalog.places.length ? catalog.places : getCatalogSeed().places, request)
@@ -440,6 +464,7 @@ export async function planTrip(input = {}) {
     },
     catalogSummary: {
       source: catalog.source,
+      selectedZone: selectedZone?.label ?? 'Todo Euskadi',
       places: catalog.places.length,
       events: catalog.events.length,
       weatherBands: catalog.weather.length,
