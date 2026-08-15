@@ -1,0 +1,35 @@
+{
+	"name": "ds_http_flatfiles_weather_history",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "LS_HTTP_OpenDataEuskadi",
+			"type": "LinkedServiceReference"
+		},
+		"parameters": {
+			"year": {
+				"type": "string"
+			},
+			"month": {
+				"type": "string"
+			},
+			"sensor": {
+				"type": "string"
+			}
+		},
+		"folder": {
+			"name": "Source"
+		},
+		"annotations": [],
+		"type": "Json",
+		"typeProperties": {
+			"location": {
+				"type": "HttpServerLocation",
+				"relativeUrl": {
+					"value": "@concat('contenidos/ds_meteorologicos/met_stations_ds_', dataset().year, '/opendata/', dataset().year, '/', dataset().sensor, '/', dataset().sensor, '_', dataset().year, '_', dataset().month, '.xml')",
+					"type": "Expression"
+				}
+			}
+		},
+		"schema": {}
+	}
+}
