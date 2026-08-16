@@ -1,0 +1,62 @@
+{
+	"name": "pl_ingestion_one_time_load_natural_places",
+	"properties": {
+		"activities": [
+			{
+				"name": "Copy data1",
+				"type": "Copy",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "JsonSource",
+						"storeSettings": {
+							"type": "HttpReadSettings",
+							"requestMethod": "GET"
+						},
+						"formatSettings": {
+							"type": "JsonReadSettings"
+						}
+					},
+					"sink": {
+						"type": "JsonSink",
+						"storeSettings": {
+							"type": "AzureBlobFSWriteSettings"
+						},
+						"formatSettings": {
+							"type": "JsonWriteSettings"
+						}
+					},
+					"enableStaging": false
+				},
+				"inputs": [
+					{
+						"referenceName": "ds_http_flatfiles",
+						"type": "DatasetReference",
+						"parameters": {
+							"url_data": "/contenidos/ds_recursos_turisticos/espacios_naturales_euskadi/opendata/espacios-naturales.json"
+						}
+					}
+				],
+				"outputs": [
+					{
+						"referenceName": "ds_adls_flatfiles",
+						"type": "DatasetReference",
+						"parameters": {
+							"path": "cultural",
+							"filename": "natural_places.json"
+						}
+					}
+				]
+			}
+		],
+		"annotations": []
+	}
+}
