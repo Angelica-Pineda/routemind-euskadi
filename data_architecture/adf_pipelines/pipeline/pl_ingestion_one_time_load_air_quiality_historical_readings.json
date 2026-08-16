@@ -1,0 +1,58 @@
+{
+	"name": "pl_ingestion_one_time_load_air_quiality_historical_readings",
+	"properties": {
+		"activities": [
+			{
+				"name": "ForEach Year",
+				"type": "ForEach",
+				"dependsOn": [],
+				"userProperties": [],
+				"typeProperties": {
+					"items": {
+						"value": "@variables('years')",
+						"type": "Expression"
+					},
+					"isSequential": true,
+					"activities": [
+						{
+							"name": "Execute Pipeline1",
+							"type": "ExecutePipeline",
+							"dependsOn": [],
+							"policy": {
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"pipeline": {
+									"referenceName": "pl_historical_readings_air_quality_by_county",
+									"type": "PipelineReference"
+								},
+								"waitOnCompletion": true,
+								"parameters": {
+									"param_year": {
+										"value": "@item()",
+										"type": "Expression"
+									}
+								}
+							}
+						}
+					]
+				}
+			}
+		],
+		"variables": {
+			"years": {
+				"type": "Array",
+				"defaultValue": [
+					"2025",
+					"2024",
+					"2023",
+					"2022",
+					"2021",
+					"2020"
+				]
+			}
+		},
+		"annotations": []
+	}
+}

@@ -1,0 +1,61 @@
+{
+	"name": "pl_ingestion_one_time_load_air_quiality_station",
+	"properties": {
+		"activities": [
+			{
+				"name": "Copy data1",
+				"type": "Copy",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "RestSource",
+						"httpRequestTimeout": "00:01:40",
+						"requestInterval": "00.00:00:00.010",
+						"requestMethod": "GET",
+						"paginationRules": {
+							"supportRFC5988": "true"
+						}
+					},
+					"sink": {
+						"type": "JsonSink",
+						"storeSettings": {
+							"type": "AzureBlobFSWriteSettings"
+						},
+						"formatSettings": {
+							"type": "JsonWriteSettings"
+						}
+					},
+					"enableStaging": false
+				},
+				"inputs": [
+					{
+						"referenceName": "ds_rest_air_quality",
+						"type": "DatasetReference",
+						"parameters": {
+							"url_data": "/air-quality/stations?lang=SPANISH"
+						}
+					}
+				],
+				"outputs": [
+					{
+						"referenceName": "ds_adls_flatfiles",
+						"type": "DatasetReference",
+						"parameters": {
+							"path": "weather/air_quality/stations",
+							"filename": "air_quality_stations.json"
+						}
+					}
+				]
+			}
+		],
+		"annotations": []
+	}
+}

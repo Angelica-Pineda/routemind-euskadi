@@ -1,0 +1,26 @@
+{
+	"name": "ds_rest_air_quality",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "LS_REST_OpenDataEuskadi",
+			"type": "LinkedServiceReference"
+		},
+		"parameters": {
+			"url_data": {
+				"type": "string"
+			}
+		},
+		"folder": {
+			"name": "Source"
+		},
+		"annotations": [],
+		"type": "RestResource",
+		"typeProperties": {
+			"relativeUrl": {
+				"value": "@dataset().url_data",
+				"type": "Expression"
+			}
+		},
+		"schema": []
+	}
+}

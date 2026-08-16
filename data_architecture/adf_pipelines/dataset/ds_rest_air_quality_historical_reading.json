@@ -1,0 +1,32 @@
+{
+	"name": "ds_rest_air_quality_historical_reading",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "LS_REST_OpenDataEuskadi",
+			"type": "LinkedServiceReference"
+		},
+		"parameters": {
+			"start_date": {
+				"type": "string"
+			},
+			"end_date": {
+				"type": "string"
+			},
+			"county": {
+				"type": "string"
+			}
+		},
+		"folder": {
+			"name": "Source"
+		},
+		"annotations": [],
+		"type": "RestResource",
+		"typeProperties": {
+			"relativeUrl": {
+				"value": "@concat('air-quality/measurements/daily/counties/', dataset().county, '/from/', dataset().start_date, '/to/', dataset().end_date, '?lang=SPANISH')",
+				"type": "Expression"
+			}
+		},
+		"schema": []
+	}
+}

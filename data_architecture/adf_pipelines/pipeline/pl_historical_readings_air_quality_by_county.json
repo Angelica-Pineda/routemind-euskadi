@@ -1,0 +1,108 @@
+{
+	"name": "pl_historical_readings_air_quality_by_county",
+	"properties": {
+		"activities": [
+			{
+				"name": "ForEach county",
+				"type": "ForEach",
+				"dependsOn": [],
+				"userProperties": [],
+				"typeProperties": {
+					"items": {
+						"value": "@variables('array_county')",
+						"type": "Expression"
+					},
+					"isSequential": true,
+					"activities": [
+						{
+							"name": "Copy data1",
+							"type": "Copy",
+							"dependsOn": [],
+							"policy": {
+								"timeout": "0.12:00:00",
+								"retry": 0,
+								"retryIntervalInSeconds": 30,
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"source": {
+									"type": "RestSource",
+									"httpRequestTimeout": "00:01:40",
+									"requestInterval": "00.00:00:00.010",
+									"requestMethod": "GET",
+									"paginationRules": {
+										"supportRFC5988": "true"
+									}
+								},
+								"sink": {
+									"type": "JsonSink",
+									"storeSettings": {
+										"type": "AzureBlobFSWriteSettings"
+									},
+									"formatSettings": {
+										"type": "JsonWriteSettings"
+									}
+								},
+								"enableStaging": false
+							},
+							"inputs": [
+								{
+									"referenceName": "ds_rest_air_quality_historical_reading",
+									"type": "DatasetReference",
+									"parameters": {
+										"start_date": {
+											"value": "@concat(pipeline().parameters.param_year, '-', '08-01')",
+											"type": "Expression"
+										},
+										"end_date": {
+											"value": "@concat(pipeline().parameters.param_year, '-', '11-30')",
+											"type": "Expression"
+										},
+										"county": {
+											"value": "@item()",
+											"type": "Expression"
+										}
+									}
+								}
+							],
+							"outputs": [
+								{
+									"referenceName": "ds_adls_flatfiles",
+									"type": "DatasetReference",
+									"parameters": {
+										"path": {
+											"value": "weather/air_quality/historical_readings/@{pipeline().parameters.param_year}",
+											"type": "Expression"
+										},
+										"filename": {
+											"value": "@{item()}.json",
+											"type": "Expression"
+										}
+									}
+								}
+							]
+						}
+					]
+				}
+			}
+		],
+		"parameters": {
+			"param_year": {
+				"type": "string"
+			}
+		},
+		"variables": {
+			"array_county": {
+				"type": "Array",
+				"defaultValue": [
+					"01",
+					"48",
+					"20"
+				]
+			}
+		},
+		"annotations": []
+	}
+}
