@@ -8,6 +8,9 @@
 		"parameters": {
 			"path": {
 				"type": "string"
+			},
+			"filename": {
+				"type": "string"
 			}
 		},
 		"folder": {
@@ -18,7 +21,15 @@
 		"typeProperties": {
 			"location": {
 				"type": "AzureBlobFSLocation",
-				"fileSystem": "landing"
+				"fileName": {
+					"value": "@dataset().filename",
+					"type": "Expression"
+				},
+				"folderPath": {
+					"value": "@dataset().path",
+					"type": "Expression"
+				},
+				"fileSystem": "bronze"
 			}
 		},
 		"schema": {}
