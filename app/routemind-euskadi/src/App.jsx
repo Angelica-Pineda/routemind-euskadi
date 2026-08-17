@@ -13,6 +13,7 @@ import {
   MapPin,
   Route,
   Sparkles,
+  ExternalLink,
   WandSparkles,
 } from 'lucide-react'
 import { paceOptions, preferenceOptions, siteOptions, transportOptions, zoneOptions } from '../shared/catalog.js'
@@ -106,6 +107,22 @@ function MetricCard({ icon: Icon, title, text }) {
   )
 }
 
+function LinkedinMark() {
+  return (
+    <svg viewBox="0 0 24 24" aria-hidden="true" className="h-4 w-4 fill-current">
+      <path d="M19.5 3H4.5A1.5 1.5 0 0 0 3 4.5v15A1.5 1.5 0 0 0 4.5 21h15a1.5 1.5 0 0 0 1.5-1.5v-15A1.5 1.5 0 0 0 19.5 3ZM8.25 18H5.5v-8.5h2.75V18ZM6.88 8.46A1.61 1.61 0 1 1 6.9 5.24a1.61 1.61 0 0 1-.02 3.22ZM18 18h-2.75v-4.14c0-1-.02-2.27-1.38-2.27-1.38 0-1.59 1.08-1.59 2.19V18H9.53v-8.5h2.64v1.16h.04c.37-.7 1.27-1.45 2.61-1.45 2.8 0 3.32 1.84 3.32 4.23V18Z"/>
+    </svg>
+  )
+}
+
+function GithubMark() {
+  return (
+    <svg viewBox="0 0 24 24" aria-hidden="true" className="h-4 w-4 fill-current">
+      <path d="M12 2C6.48 2 2 6.58 2 12.24c0 4.52 2.87 8.35 6.84 9.7.5.1.68-.22.68-.49v-1.72c-2.78.62-3.37-1.17-3.37-1.17-.46-1.2-1.12-1.52-1.12-1.52-.92-.65.07-.64.07-.64 1.02.07 1.56 1.07 1.56 1.07.9 1.59 2.36 1.13 2.93.86.09-.67.35-1.13.64-1.39-2.22-.26-4.56-1.13-4.56-5.05 0-1.12.39-2.04 1.03-2.76-.11-.26-.45-1.31.1-2.72 0 0 .84-.28 2.75 1.06a9.12 9.12 0 0 1 5 0c1.91-1.34 2.75-1.06 2.75-1.06.55 1.41.21 2.46.1 2.72.64.72 1.03 1.64 1.03 2.76 0 3.93-2.34 4.79-4.57 5.04.36.32.68.95.68 1.92v2.84c0 .27.18.59.69.49A10.26 10.26 0 0 0 22 12.24C22 6.58 17.52 2 12 2Z"/>
+    </svg>
+  )
+}
+
 function createZoneMarkerIcon(active) {
   return L.divIcon({
     className: 'route-marker-icon',
@@ -124,7 +141,7 @@ function MapZonePreview({ selectedZone, onSelectZone }) {
   const mapCenter = selectedZone?.center ?? zoneOptions[0].center
 
   return (
-    <div className="overflow-hidden rounded-[2rem] border border-white/10 bg-slate-950/70 shadow-[0_24px_100px_rgba(2,6,23,0.3)]">
+    <div className="relative overflow-hidden rounded-[2rem] border border-white/10 bg-slate-950/70 shadow-[0_24px_100px_rgba(2,6,23,0.3)]">
       <div className="flex flex-wrap items-center justify-between gap-3 border-b border-white/10 px-5 py-4">
         <div>
           <p className="text-xs uppercase tracking-[0.3em] text-emerald-200/80">Mapa real</p>
@@ -136,8 +153,8 @@ function MapZonePreview({ selectedZone, onSelectZone }) {
         </div>
       </div>
 
-      <div className="grid lg:grid-cols-[1.15fr_0.85fr]">
-        <div className="map-shell h-[28rem] min-h-[24rem]">
+      <div className="map-preview-shell">
+        <div className="map-shell map-preview-map h-[34rem] min-h-[28rem] lg:h-[40rem]">
           <MapContainer center={mapCenter} zoom={8} scrollWheelZoom className="h-full w-full">
             <TileLayer
               attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
@@ -167,8 +184,18 @@ function MapZonePreview({ selectedZone, onSelectZone }) {
           </MapContainer>
         </div>
 
-        <div className="border-t border-white/10 bg-white/5 p-5 lg:border-l lg:border-t-0">
-          <div className="grid gap-3">
+        <aside className="map-preview-sidebar rounded-[2rem] border border-white/10 bg-slate-950/92 p-4 shadow-[0_24px_100px_rgba(2,6,23,0.3)] backdrop-blur-xl lg:absolute lg:right-4 lg:top-4 lg:w-[24rem] lg:max-w-[calc(100%-2rem)] lg:p-5 xl:w-[27rem]">
+          <div className="flex items-center justify-between gap-3">
+            <div>
+              <p className="text-xs uppercase tracking-[0.3em] text-emerald-200/80">Zonas</p>
+              <h4 className="mt-2 text-lg font-semibold text-white">Explora y cambia sin salir del mapa</h4>
+            </div>
+            <span className="rounded-full border border-white/10 bg-white/5 px-2.5 py-1 text-[11px] text-slate-300">
+              {zoneOptions.length} opciones
+            </span>
+          </div>
+
+          <div className="mt-4 grid gap-3 max-h-[26rem] overflow-y-auto pr-1 lg:max-h-[32rem]">
             {zoneOptions.map((zone) => (
               <button
                 key={zone.id}
@@ -177,8 +204,8 @@ function MapZonePreview({ selectedZone, onSelectZone }) {
                 className={[
                   'rounded-2xl border p-4 text-left transition-all duration-200',
                   selectedZone?.id === zone.id
-                    ? 'border-emerald-300/50 bg-emerald-300/10'
-                    : 'border-white/10 bg-slate-950/60 hover:border-white/20 hover:bg-white/8',
+                    ? 'border-emerald-300/50 bg-emerald-300/10 shadow-[0_0_28px_rgba(16,185,129,0.12)]'
+                    : 'border-white/10 bg-white/5 hover:border-white/20 hover:bg-white/8',
                 ].join(' ')}
               >
                 <div className="flex items-center justify-between gap-3">
@@ -201,9 +228,75 @@ function MapZonePreview({ selectedZone, onSelectZone }) {
               </button>
             ))}
           </div>
-        </div>
+        </aside>
       </div>
     </div>
+  )
+}
+
+function Footer() {
+  return (
+    <footer className="relative overflow-hidden border-t border-white/10 bg-slate-950/80">
+      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(16,185,129,0.12),transparent_30%),radial-gradient(circle_at_20%_120%,rgba(59,130,246,0.1),transparent_24%)]" aria-hidden="true" />
+      <div className="relative mx-auto flex w-full max-w-none flex-col gap-6 px-4 py-8 sm:px-6 lg:px-8 xl:px-10 2xl:px-12">
+        <div className="grid gap-6 lg:grid-cols-[1.4fr_0.9fr_0.9fr] lg:items-start">
+          <div>
+            <div className="inline-flex items-center gap-2 rounded-full border border-emerald-300/20 bg-emerald-300/10 px-3 py-1 text-xs uppercase tracking-[0.24em] text-emerald-100">
+              RouteMind Euskadi
+            </div>
+            <p className="mt-4 max-w-2xl text-sm leading-7 text-slate-300">
+              Proyecto open source creado para convertir la planificación de turismo en Euskadi en una experiencia más clara, inspiradora y útil: un punto de partida visual para descubrir territorio, combinar intereses y generar itinerarios con IA.
+            </p>
+          </div>
+
+          <div>
+            <p className="text-xs uppercase tracking-[0.28em] text-slate-400">Autor del TFM</p>
+            <div className="mt-4 space-y-3">
+              <a
+                href="https://www.linkedin.com/in/angelica-pineda-martinez-8094a6186/"
+                target="_blank"
+                rel="noreferrer"
+                className="footer-link group flex items-center justify-between rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-sm text-slate-200 transition hover:border-emerald-300/40 hover:bg-white/8"
+              >
+                <span className="flex items-center gap-3">
+                  <span className="footer-link-icon text-emerald-200"><LinkedinMark /></span>
+                  LinkedIn
+                </span>
+                <ExternalLink className="h-4 w-4 text-slate-400 transition group-hover:text-emerald-200" />
+              </a>
+              <a
+                href="https://github.com/Angelica-Pineda"
+                target="_blank"
+                rel="noreferrer"
+                className="footer-link group flex items-center justify-between rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-sm text-slate-200 transition hover:border-emerald-300/40 hover:bg-white/8"
+              >
+                <span className="flex items-center gap-3">
+                  <span className="footer-link-icon text-emerald-200"><GithubMark /></span>
+                  GitHub
+                </span>
+                <ExternalLink className="h-4 w-4 text-slate-400 transition group-hover:text-emerald-200" />
+              </a>
+            </div>
+          </div>
+
+          <div>
+            <p className="text-xs uppercase tracking-[0.28em] text-slate-400">Proyecto open source</p>
+            <a
+              href="https://github.com/Angelica-Pineda/routemind-euskadi"
+              target="_blank"
+              rel="noreferrer"
+              className="group mt-4 flex items-center justify-between rounded-[1.5rem] border border-emerald-300/20 bg-emerald-300/10 px-4 py-4 text-sm text-emerald-50 transition hover:border-emerald-300/40 hover:bg-emerald-300/15"
+            >
+              <span>
+                Repositorio del proyecto
+                <span className="mt-1 block text-xs text-emerald-100/80">Código, estructura y evolución completa</span>
+              </span>
+              <ExternalLink className="h-4 w-4 text-emerald-100 transition group-hover:translate-x-0.5" />
+            </a>
+          </div>
+        </div>
+      </div>
+    </footer>
   )
 }
 
@@ -364,7 +457,7 @@ function App() {
       <div className="aurora-base pointer-events-none absolute inset-0" aria-hidden="true" />
       <div className="grid-layer pointer-events-none absolute inset-0" aria-hidden="true" />
 
-      <main className="relative z-10 mx-auto flex min-h-screen w-full max-w-6xl flex-col gap-8 px-4 py-5 sm:px-6 lg:px-8 lg:py-8">
+      <main className="relative z-10 mx-auto flex min-h-screen w-full max-w-none flex-col gap-8 px-4 py-5 sm:px-6 lg:px-8 xl:px-10 2xl:px-12 lg:py-8">
         <header className="overflow-hidden rounded-[2rem] border border-white/10 bg-slate-950/70 p-6 shadow-[0_24px_100px_rgba(2,6,23,0.35)] backdrop-blur-xl sm:p-8">
           <div className="absolute -right-8 -top-12 h-40 w-40 rounded-full bg-emerald-300/10 blur-3xl hero-orb" aria-hidden="true" />
           <div className="absolute bottom-0 right-10 h-28 w-28 rounded-full bg-cyan-300/10 blur-3xl hero-orb hero-orb-delayed" aria-hidden="true" />
@@ -798,6 +891,8 @@ function App() {
           </motion.section>
         </section>
       </main>
+
+      <Footer />
     </div>
   )
 }

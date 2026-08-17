@@ -101,3 +101,29 @@
 .route-marker--active span {
   box-shadow: 0 0 0 7px color-mix(in srgb, var(--marker-color, #34d399) 28%, transparent);
 }
+
+.map-preview-shell {
+  position: relative;
+}
+
+.map-preview-map {
+  width: 100%;
+}
+
+.map-preview-sidebar {
+  margin-top: 1rem;
+}
+
+@media (min-width: 1024px) {
+  .map-preview-sidebar {
+    margin-top: 0;
+  }
+}
+
+.footer-link-icon {
+  transition: transform 180ms ease, color 180ms ease;
+}
+
+.footer-link:hover .footer-link-icon {
+  transform: translateX(2px);
+}
