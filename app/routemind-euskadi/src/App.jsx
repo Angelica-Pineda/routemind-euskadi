@@ -88,14 +88,14 @@ const heroMetrics = [
 
 function MetricCard({ icon: Icon, title, text }) {
   return (
-    <div className="group rounded-3xl border border-white/5 bg-white/[0.02] p-6 backdrop-blur-xl transition duration-300 hover:border-emerald-500/30 hover:bg-white/[0.05]">
+    <div className="group rounded-3xl border border-white/5 bg-white/[0.02] p-6 backdrop-blur-xl transition duration-300 hover:border-orange-500/30 hover:bg-white/[0.05]">
       <div className="flex flex-col gap-4">
-        <div className="inline-flex h-12 w-12 items-center justify-center rounded-2xl bg-emerald-500/10 text-emerald-300 transition-transform duration-300 group-hover:-translate-y-1 group-hover:bg-emerald-500/20">
+        <div className="inline-flex h-12 w-12 items-center justify-center rounded-2xl bg-orange-500/10 text-orange-400 transition-transform duration-300 group-hover:-translate-y-1 group-hover:bg-orange-500/20">
           <Icon className="h-6 w-6" />
         </div>
         <div>
           <h3 className="text-base font-semibold text-white">{title}</h3>
-          <p className="mt-2 text-sm leading-relaxed text-slate-400">{text}</p>
+          <p className="mt-2 text-sm leading-relaxed text-zinc-400">{text}</p>
         </div>
       </div>
     </div>
@@ -126,7 +126,7 @@ function createZoneMarkerIcon(active) {
   return L.divIcon({
     className: 'route-marker-icon',
     html: `
-      <div class="route-marker ${active ? 'route-marker--active' : ''}">
+      <div class="route-marker ${active ? 'route-marker--active-orange' : ''}">
         <span></span>
       </div>
     `,
@@ -140,14 +140,14 @@ function MapZonePreview({ selectedZone, onSelectZone }) {
   const mapCenter = selectedZone?.center ?? zoneOptions[0].center
 
   return (
-    <div className="overflow-hidden rounded-[2rem] border border-white/10 bg-slate-950/70 shadow-[0_24px_100px_rgba(2,6,23,0.3)] backdrop-blur-md">
+    <div className="overflow-hidden rounded-[2rem] border border-white/10 bg-zinc-950/70 shadow-[0_24px_100px_rgba(9,9,11,0.5)] backdrop-blur-md">
       <div className="flex flex-wrap items-center justify-between gap-3 border-b border-white/10 px-5 py-4">
         <div>
-          <p className="text-xs uppercase tracking-[0.3em] text-emerald-200/80">Mapa real</p>
+          <p className="text-xs uppercase tracking-[0.3em] text-orange-400/80">Mapa real</p>
           <h3 className="mt-2 text-xl font-semibold text-white">Selecciona la zona con el mapa o con la lista</h3>
         </div>
-        <div className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-3 py-1.5 text-xs text-slate-300">
-          <LocateFixed className="h-3.5 w-3.5 text-emerald-200" />
+        <div className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-3 py-1.5 text-xs text-zinc-300">
+          <LocateFixed className="h-3.5 w-3.5 text-orange-400" />
           {selectedZone?.label}
         </div>
       </div>
@@ -170,9 +170,9 @@ function MapZonePreview({ selectedZone, onSelectZone }) {
                 >
                   <Popup>
                     <div className="max-w-[220px]">
-                      <p className="text-xs uppercase tracking-[0.2em] text-slate-500">{zone.shortLabel}</p>
-                      <h4 className="mt-1 text-sm font-semibold text-slate-900">{zone.label}</h4>
-                      <p className="mt-2 text-sm text-slate-700">{zone.summary}</p>
+                      <p className="text-xs uppercase tracking-[0.2em] text-zinc-500">{zone.shortLabel}</p>
+                      <h4 className="mt-1 text-sm font-semibold text-zinc-900">{zone.label}</h4>
+                      <p className="mt-2 text-sm text-zinc-700">{zone.summary}</p>
                     </div>
                   </Popup>
                 </Marker>
@@ -181,13 +181,13 @@ function MapZonePreview({ selectedZone, onSelectZone }) {
           </MapContainer>
         </div>
 
-        <aside className="map-preview-sidebar border-t border-white/10 bg-slate-950/92 p-4 backdrop-blur-xl lg:sticky lg:top-4 lg:self-start lg:rounded-[1.6rem] lg:border lg:border-white/10 lg:p-5">
+        <aside className="map-preview-sidebar border-t border-white/10 bg-zinc-950/92 p-4 backdrop-blur-xl lg:sticky lg:top-4 lg:self-start lg:rounded-[1.6rem] lg:border lg:border-white/10 lg:p-5">
           <div className="flex items-center justify-between gap-3">
             <div>
-              <p className="text-xs uppercase tracking-[0.3em] text-emerald-200/80">Zonas</p>
+              <p className="text-xs uppercase tracking-[0.3em] text-orange-400/80">Zonas</p>
               <h4 className="mt-2 text-lg font-semibold text-white">Explora sin salir</h4>
             </div>
-            <span className="rounded-full border border-white/10 bg-white/5 px-2.5 py-1 text-[11px] text-slate-300">
+            <span className="rounded-full border border-white/10 bg-white/5 px-2.5 py-1 text-[11px] text-zinc-300">
               {zoneOptions.length} opciones
             </span>
           </div>
@@ -201,23 +201,23 @@ function MapZonePreview({ selectedZone, onSelectZone }) {
                 className={[
                   'rounded-2xl border p-4 text-left transition-all duration-200',
                   selectedZone?.id === zone.id
-                    ? 'border-emerald-500/50 bg-emerald-500/10 shadow-[0_0_28px_rgba(16,185,129,0.12)]'
+                    ? 'border-orange-500/50 bg-orange-500/10 shadow-[0_0_28px_rgba(249,115,22,0.12)]'
                     : 'border-white/10 bg-white/5 hover:border-white/20 hover:bg-white/8',
                 ].join(' ')}
               >
                 <div className="flex items-center justify-between gap-3">
                   <div>
-                    <p className="text-[11px] uppercase tracking-[0.28em] text-slate-400">{zone.shortLabel}</p>
+                    <p className="text-[11px] uppercase tracking-[0.28em] text-zinc-400">{zone.shortLabel}</p>
                     <h4 className="mt-1 text-base font-semibold text-white">{zone.label}</h4>
                   </div>
-                  <span className="rounded-full border border-white/10 bg-white/5 px-2.5 py-1 text-[11px] text-slate-300">
+                  <span className="rounded-full border border-white/10 bg-white/5 px-2.5 py-1 text-[11px] text-zinc-300">
                     {zone.province}
                   </span>
                 </div>
-                <p className="mt-3 text-sm leading-6 text-slate-300">{zone.summary}</p>
+                <p className="mt-3 text-sm leading-6 text-zinc-300">{zone.summary}</p>
                 <div className="mt-3 flex flex-wrap gap-2">
                   {zone.cities.slice(0, 3).map((city) => (
-                    <span key={city} className="rounded-full border border-white/10 bg-white/5 px-2.5 py-1 text-[11px] text-slate-300">
+                    <span key={city} className="rounded-full border border-white/10 bg-white/5 px-2.5 py-1 text-[11px] text-zinc-300">
                       {city}
                     </span>
                   ))}
@@ -233,36 +233,36 @@ function MapZonePreview({ selectedZone, onSelectZone }) {
 
 function Footer() {
   return (
-    <footer className="relative mt-24 overflow-hidden border-t border-white/10 bg-[#07131f]">
+    <footer className="relative mt-24 overflow-hidden border-t border-white/10 bg-[#09090b]">
       <div className="relative mx-auto flex w-full max-w-7xl flex-col gap-8 px-4 py-12 sm:px-6 lg:px-8 xl:px-10 2xl:px-12 lg:py-16">
         <div className="grid gap-8 lg:grid-cols-[1.05fr_0.95fr] lg:items-start">
           <div className="max-w-2xl">
-            <div className="flex items-center gap-3 text-[11px] uppercase tracking-[0.26em] text-slate-200">
+            <div className="flex items-center gap-3 text-[11px] uppercase tracking-[0.26em] text-zinc-200">
               <EuskadiFlag />
-              <span className="text-slate-100">RouteMind Euskadi</span>
+              <span className="text-zinc-100">RouteMind Euskadi</span>
             </div>
             <h2 className="mt-6 font-heading text-2xl font-semibold tracking-tight text-white sm:text-3xl">
               Hecho por Angélica Pineda
             </h2>
-            <p className="mt-4 max-w-xl text-sm leading-7 text-slate-300 sm:text-[15px]">
+            <p className="mt-4 max-w-xl text-sm leading-7 text-zinc-300 sm:text-[15px]">
               Una plataforma abierta para convertir la planificación de turismo en Euskadi en una experiencia más clara, inspiradora y humana: descubrir, combinar y generar rutas con criterio.
             </p>
           </div>
 
           <div className="grid gap-6 sm:grid-cols-2">
             <div>
-              <p className="text-xs uppercase tracking-[0.28em] text-slate-400">CONTACTO</p>
+              <p className="text-xs uppercase tracking-[0.28em] text-zinc-400">CONTACTO</p>
               <ul className="mt-4 space-y-3 text-sm">
                 <li>
                   <a
                     href="https://www.linkedin.com/in/angelica-pineda-martinez-8094a6186/"
                     target="_blank"
                     rel="noreferrer"
-                    className="footer-link group flex items-center gap-3 text-slate-300 transition hover:text-white"
+                    className="footer-link group flex items-center gap-3 text-zinc-300 transition hover:text-white"
                   >
-                    <span className="footer-link-icon text-emerald-300"><LinkedinMark /></span>
-                    <span className="border-b border-transparent pb-0.5 transition group-hover:border-emerald-400/50">LinkedIn</span>
-                    <ExternalLink className="h-3.5 w-3.5 text-slate-500 transition group-hover:text-emerald-300" />
+                    <span className="footer-link-icon text-orange-400"><LinkedinMark /></span>
+                    <span className="border-b border-transparent pb-0.5 transition group-hover:border-orange-500/50">LinkedIn</span>
+                    <ExternalLink className="h-3.5 w-3.5 text-zinc-500 transition group-hover:text-orange-400" />
                   </a>
                 </li>
                 <li>
@@ -270,40 +270,40 @@ function Footer() {
                     href="https://github.com/Angelica-Pineda"
                     target="_blank"
                     rel="noreferrer"
-                    className="footer-link group flex items-center gap-3 text-slate-300 transition hover:text-white"
+                    className="footer-link group flex items-center gap-3 text-zinc-300 transition hover:text-white"
                   >
-                    <span className="footer-link-icon text-emerald-300"><GithubMark /></span>
-                    <span className="border-b border-transparent pb-0.5 transition group-hover:border-emerald-400/50">GitHub</span>
-                    <ExternalLink className="h-3.5 w-3.5 text-slate-500 transition group-hover:text-emerald-300" />
+                    <span className="footer-link-icon text-orange-400"><GithubMark /></span>
+                    <span className="border-b border-transparent pb-0.5 transition group-hover:border-orange-500/50">GitHub</span>
+                    <ExternalLink className="h-3.5 w-3.5 text-zinc-500 transition group-hover:text-orange-400" />
                   </a>
                 </li>
                 <li>
                   <a
                     href="mailto:angelicap2298@gmail.com"
-                    className="footer-link group flex items-center gap-3 text-slate-300 transition hover:text-white"
+                    className="footer-link group flex items-center gap-3 text-zinc-300 transition hover:text-white"
                   >
-                    <span className="footer-link-icon text-emerald-300">
+                    <span className="footer-link-icon text-orange-400">
                       <Mail className="h-4 w-4" />
                     </span>
-                    <span className="border-b border-transparent pb-0.5 transition group-hover:border-emerald-400/50">angelicap2298@gmail.com</span>
+                    <span className="border-b border-transparent pb-0.5 transition group-hover:border-orange-500/50">angelicap2298@gmail.com</span>
                   </a>
                 </li>
               </ul>
             </div>
 
             <div>
-              <p className="text-xs uppercase tracking-[0.28em] text-slate-400">Open source</p>
+              <p className="text-xs uppercase tracking-[0.28em] text-zinc-400">Open source</p>
               <a
                 href="https://github.com/Angelica-Pineda/routemind-euskadi"
                 target="_blank"
                 rel="noreferrer"
-                className="footer-link group mt-4 flex items-center gap-3 text-sm text-slate-300 transition hover:text-white"
+                className="footer-link group mt-4 flex items-center gap-3 text-sm text-zinc-300 transition hover:text-white"
               >
-                <span className="footer-link-icon text-emerald-300"><Route className="h-4 w-4" /></span>
-                <span className="border-b border-transparent pb-0.5 transition group-hover:border-emerald-400/50">Repositorio del proyecto</span>
-                <ExternalLink className="h-3.5 w-3.5 text-slate-500 transition group-hover:text-emerald-300" />
+                <span className="footer-link-icon text-orange-400"><Route className="h-4 w-4" /></span>
+                <span className="border-b border-transparent pb-0.5 transition group-hover:border-orange-500/50">Repositorio del proyecto</span>
+                <ExternalLink className="h-3.5 w-3.5 text-zinc-500 transition group-hover:text-orange-400" />
               </a>
-              <p className="mt-3 text-xs leading-6 text-slate-400">
+              <p className="mt-3 text-xs leading-6 text-zinc-400">
                 Código, estructura y evolución completa del proyecto.
               </p>
             </div>
@@ -316,13 +316,13 @@ function Footer() {
 
 function DayCard({ day, index }) {
   return (
-    <div className="rounded-3xl border border-white/10 bg-slate-950/60 p-5 shadow-[0_16px_48px_rgba(2,6,23,0.35)]">
+    <div className="rounded-3xl border border-white/10 bg-zinc-950/60 p-5 shadow-[0_16px_48px_rgba(9,9,11,0.5)]">
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
-          <p className="text-xs uppercase tracking-[0.3em] text-emerald-300/80">Día {index + 1}</p>
+          <p className="text-xs uppercase tracking-[0.3em] text-orange-400/80">Día {index + 1}</p>
           <h4 className="mt-2 text-lg font-semibold text-white">{day.label ?? day.date}</h4>
         </div>
-        <span className="rounded-full border border-white/10 bg-white/5 px-3 py-1 text-xs text-slate-300">
+        <span className="rounded-full border border-white/10 bg-white/5 px-3 py-1 text-xs text-zinc-300">
           {day.theme}
         </span>
       </div>
@@ -335,30 +335,30 @@ function DayCard({ day, index }) {
           ['Noche', day.evening],
         ].map(([label, block]) => (
           <div key={label} className="rounded-2xl border border-white/5 bg-white/[0.03] p-4">
-            <p className="text-xs uppercase tracking-[0.25em] text-slate-400">{label}</p>
+            <p className="text-xs uppercase tracking-[0.25em] text-zinc-400">{label}</p>
             {block ? (
               <>
                 <h5 className="mt-2 text-sm font-semibold text-white">{block.title}</h5>
-                <p className="mt-2 text-xs leading-5 text-slate-300">{block.reason}</p>
-                <div className="mt-3 flex flex-wrap gap-2 text-[11px] text-slate-400">
+                <p className="mt-2 text-xs leading-5 text-zinc-300">{block.reason}</p>
+                <div className="mt-3 flex flex-wrap gap-2 text-[11px] text-zinc-400">
                   {block.place ? <span>{block.place}</span> : null}
                   {block.setting ? <span>{block.setting}</span> : null}
                 </div>
               </>
             ) : (
-              <p className="mt-2 text-sm text-slate-500">Sin datos</p>
+              <p className="mt-2 text-sm text-zinc-500">Sin datos</p>
             )}
           </div>
         ))}
       </div>
 
       <div className="mt-4 grid gap-3 md:grid-cols-2">
-        <div className="rounded-2xl border border-white/5 bg-white/[0.03] p-4 text-sm text-slate-300">
-          <span className="block text-xs uppercase tracking-[0.25em] text-slate-400">Meteorología</span>
+        <div className="rounded-2xl border border-white/5 bg-white/[0.03] p-4 text-sm text-zinc-300">
+          <span className="block text-xs uppercase tracking-[0.25em] text-zinc-400">Meteorología</span>
           <p className="mt-2 leading-6">{day.weatherNote || 'La API generó una propuesta adaptada al contexto disponible.'}</p>
         </div>
-        <div className="rounded-2xl border border-white/5 bg-white/[0.03] p-4 text-sm text-slate-300">
-          <span className="block text-xs uppercase tracking-[0.25em] text-slate-400">Transporte</span>
+        <div className="rounded-2xl border border-white/5 bg-white/[0.03] p-4 text-sm text-zinc-300">
+          <span className="block text-xs uppercase tracking-[0.25em] text-zinc-400">Transporte</span>
           <p className="mt-2 leading-6">{day.transportNote || 'La movilidad se ajusta al modo elegido.'}</p>
         </div>
       </div>
@@ -366,7 +366,7 @@ function DayCard({ day, index }) {
       {Array.isArray(day.notes) && day.notes.length ? (
         <div className="mt-4 flex flex-wrap gap-2">
           {day.notes.map((note) => (
-            <span key={note} className="rounded-full border border-emerald-500/20 bg-emerald-500/10 px-3 py-1 text-xs text-emerald-200">
+            <span key={note} className="rounded-full border border-orange-500/20 bg-orange-500/10 px-3 py-1 text-xs text-orange-200">
               {note}
             </span>
           ))}
@@ -452,42 +452,39 @@ function App() {
   }
 
   return (
-    <div className="relative min-h-screen bg-slate-950 font-sans text-slate-100 selection:bg-emerald-500/30 selection:text-emerald-100">
-      {/* ========================================
-        NEW HERO SECTION (100dvh, Minimalist)
-        ========================================
-      */}
+    <div className="relative min-h-screen bg-zinc-950 font-sans text-zinc-100 selection:bg-orange-500/30 selection:text-orange-100">
+      
+      {/* HEADER HERO (100dvh) */}
       <header className="relative flex h-[100dvh] min-h-[600px] w-full flex-col justify-between overflow-hidden">
         
-        {/* Creative Euskadi Flag Background */}
+        {/* Fondo Ikurriña con overlay estilo Hierro y Piedra */}
         <div className="absolute inset-0 z-0">
           <img 
             src="/Flag.svg" 
             alt="Fondo Euskadi" 
             className="h-full w-full object-cover opacity-20 mix-blend-screen grayscale-[30%]" 
           />
-          {/* Gradients to blend flag and create dark sleek mood */}
-          <div className="absolute inset-0 bg-gradient-to-b from-slate-950/40 via-slate-950/80 to-slate-950" />
-          <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_center,_var(--tw-gradient-stops))] from-emerald-900/30 via-transparent to-transparent" />
+          <div className="absolute inset-0 bg-gradient-to-b from-zinc-950/40 via-zinc-950/80 to-zinc-950" />
+          <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_center,_var(--tw-gradient-stops))] from-orange-900/20 via-transparent to-transparent" />
         </div>
 
-        {/* Hero Top Nav / Logo placeholder */}
+        {/* Navbar */}
         <div className="relative z-10 flex w-full items-center justify-between p-6 sm:p-8 lg:px-12">
           <div className="flex items-center gap-3">
             <div className="overflow-hidden rounded-lg border border-white/10 p-0.5 shadow-lg">
               <EuskadiFlag />
             </div>
-            <span className="text-xs font-semibold uppercase tracking-[0.3em] text-emerald-100">
+            <span className="text-xs font-semibold uppercase tracking-[0.3em] text-orange-100">
               RouteMind
             </span>
           </div>
-          <div className="inline-flex items-center gap-2 rounded-full border border-emerald-500/20 bg-emerald-500/10 px-3 py-1.5 text-[11px] font-medium text-emerald-300 backdrop-blur-md">
+          <div className="inline-flex items-center gap-2 rounded-full border border-orange-500/20 bg-orange-500/10 px-3 py-1.5 text-[11px] font-medium text-orange-300 backdrop-blur-md">
             <BadgeCheck className="h-3.5 w-3.5" />
             {health.label}
           </div>
         </div>
 
-        {/* Hero Main Content */}
+        {/* Main Title */}
         <motion.div 
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
@@ -496,25 +493,25 @@ function App() {
         >
           <h1 className="font-heading text-5xl font-bold tracking-tight text-white sm:text-7xl lg:text-8xl">
             Descubre Euskadi <br className="hidden sm:block" />
-            <span className="bg-gradient-to-r from-emerald-300 to-teal-100 bg-clip-text text-transparent">
+            <span className="bg-gradient-to-r from-orange-400 to-amber-300 bg-clip-text text-transparent">
               a tu propio ritmo.
             </span>
           </h1>
-          <p className="mx-auto mt-6 max-w-2xl text-base leading-relaxed text-slate-300 sm:text-lg lg:text-xl">
+          <p className="mx-auto mt-6 max-w-2xl text-base leading-relaxed text-zinc-300 sm:text-lg lg:text-xl">
             Genera itinerarios vivos, visuales y adaptados a tus gustos. Planificación turística inteligente lista para repetirse cuantas veces quieras.
           </p>
           
           <div className="mt-10 flex justify-center">
             <button 
               onClick={scrollToMap}
-              className="group flex h-14 w-14 items-center justify-center rounded-full border border-white/10 bg-white/5 backdrop-blur-md transition-all hover:border-emerald-500/40 hover:bg-white/10"
+              className="group flex h-14 w-14 items-center justify-center rounded-full border border-white/10 bg-white/5 backdrop-blur-md transition-all hover:border-orange-500/40 hover:bg-white/10"
             >
-              <ChevronDown className="h-6 w-6 text-emerald-300 transition-transform group-hover:translate-y-1" />
+              <ChevronDown className="h-6 w-6 text-orange-400 transition-transform group-hover:translate-y-1" />
             </button>
           </div>
         </motion.div>
 
-        {/* Hero Floating Metrics Container */}
+        {/* Float Cards */}
         <motion.div 
           initial={{ opacity: 0, y: 40 }}
           animate={{ opacity: 1, y: 0 }}
@@ -529,10 +526,7 @@ function App() {
         </motion.div>
       </header>
 
-      {/* ========================================
-        MAIN CONTENT (Separated from header)
-        ========================================
-      */}
+      {/* MAIN */}
       <main id="mapa-zonas" className="relative z-10 mx-auto flex w-full max-w-7xl flex-col gap-10 px-4 py-16 sm:px-6 lg:gap-14 lg:px-8 lg:py-24">
         
         <section className="space-y-8">
@@ -547,17 +541,17 @@ function App() {
           >
             <div className="flex flex-wrap items-center justify-between gap-3">
               <div>
-                <p className="text-xs font-semibold uppercase tracking-[0.3em] text-emerald-300">Zona elegida</p>
+                <p className="text-xs font-semibold uppercase tracking-[0.3em] text-orange-400">Zona elegida</p>
                 <h2 className="mt-2 text-2xl font-semibold text-white">Tu base territorial para este viaje</h2>
               </div>
-              <div className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-4 py-2 text-xs font-medium text-slate-200">
-                <LocateFixed className="h-4 w-4 text-emerald-300" />
+              <div className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-4 py-2 text-xs font-medium text-zinc-200">
+                <LocateFixed className="h-4 w-4 text-orange-400" />
                 {selectedZone?.label}
               </div>
             </div>
             <div className="mt-5 flex flex-wrap gap-2">
               {selectedZone?.cities?.map((city) => (
-                <span key={city} className="rounded-full border border-white/10 bg-white/5 px-3 py-1 text-xs text-slate-300">
+                <span key={city} className="rounded-full border border-white/10 bg-white/5 px-3 py-1 text-xs text-zinc-300">
                   {city}
                 </span>
               ))}
@@ -574,48 +568,48 @@ function App() {
           >
             <div className="flex items-center justify-between gap-3">
               <div>
-                <p className="text-xs font-semibold uppercase tracking-[0.3em] text-emerald-300">Planificador</p>
+                <p className="text-xs font-semibold uppercase tracking-[0.3em] text-orange-400">Planificador</p>
                 <h2 className="mt-2 text-2xl font-semibold text-white">Ajusta tu viaje</h2>
               </div>
-              <span className="rounded-full border border-emerald-500/20 bg-emerald-500/10 px-4 py-1.5 text-xs font-medium text-emerald-200">
+              <span className="rounded-full border border-orange-500/20 bg-orange-500/10 px-4 py-1.5 text-xs font-medium text-orange-300">
                 {tripDurationDays} días
               </span>
             </div>
 
             <div className="mt-8 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
               <label className="grid gap-2">
-                <span className="text-sm font-medium text-slate-300">Fecha desde</span>
+                <span className="text-sm font-medium text-zinc-300">Fecha desde</span>
                 <input
                   type="date"
                   value={form.startDate}
                   min={defaultStartDate}
                   max={maxDate}
                   onChange={(event) => updateField('startDate', event.target.value)}
-                  className="rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-slate-100 outline-none transition focus:border-emerald-500/50 focus:bg-white/10"
+                  className="rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-zinc-100 outline-none transition focus:border-orange-500/50 focus:bg-white/10"
                 />
               </label>
 
               <label className="grid gap-2">
-                <span className="text-sm font-medium text-slate-300">Fecha hasta</span>
+                <span className="text-sm font-medium text-zinc-300">Fecha hasta</span>
                 <input
                   type="date"
                   value={form.endDate}
                   min={form.startDate || defaultStartDate}
                   max={maxDate}
                   onChange={(event) => updateField('endDate', event.target.value)}
-                  className="rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-slate-100 outline-none transition focus:border-emerald-500/50 focus:bg-white/10"
+                  className="rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-zinc-100 outline-none transition focus:border-orange-500/50 focus:bg-white/10"
                 />
               </label>
 
               <label className="grid gap-2">
-                <span className="text-sm font-medium text-slate-300">Preferencia</span>
+                <span className="text-sm font-medium text-zinc-300">Preferencia</span>
                 <select
                   value={form.preference}
                   onChange={(event) => updateField('preference', event.target.value)}
-                  className="rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-slate-100 outline-none transition focus:border-emerald-500/50 focus:bg-white/10"
+                  className="rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-zinc-100 outline-none transition focus:border-orange-500/50 focus:bg-white/10"
                 >
                   {preferenceOptions.map((option) => (
-                    <option key={option.value} value={option.value} className="bg-slate-900">
+                    <option key={option.value} value={option.value} className="bg-zinc-900">
                       {option.label}
                     </option>
                   ))}
@@ -623,14 +617,14 @@ function App() {
               </label>
 
               <label className="grid gap-2">
-                <span className="text-sm font-medium text-slate-300">Transporte</span>
+                <span className="text-sm font-medium text-zinc-300">Transporte</span>
                 <select
                   value={form.transport}
                   onChange={(event) => updateField('transport', event.target.value)}
-                  className="rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-slate-100 outline-none transition focus:border-emerald-500/50 focus:bg-white/10"
+                  className="rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-zinc-100 outline-none transition focus:border-orange-500/50 focus:bg-white/10"
                 >
                   {transportOptions.map((option) => (
-                    <option key={option.value} value={option.value} className="bg-slate-900">
+                    <option key={option.value} value={option.value} className="bg-zinc-900">
                       {option.label}
                     </option>
                   ))}
@@ -638,14 +632,14 @@ function App() {
               </label>
 
               <label className="grid gap-2">
-                <span className="text-sm font-medium text-slate-300">Ritmo</span>
+                <span className="text-sm font-medium text-zinc-300">Ritmo</span>
                 <select
                   value={form.pace}
                   onChange={(event) => updateField('pace', event.target.value)}
-                  className="rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-slate-100 outline-none transition focus:border-emerald-500/50 focus:bg-white/10"
+                  className="rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-zinc-100 outline-none transition focus:border-orange-500/50 focus:bg-white/10"
                 >
                   {paceOptions.map((option) => (
-                    <option key={option.value} value={option.value} className="bg-slate-900">
+                    <option key={option.value} value={option.value} className="bg-zinc-900">
                       {option.label}
                     </option>
                   ))}
@@ -653,14 +647,14 @@ function App() {
               </label>
 
               <label className="grid gap-2">
-                <span className="text-sm font-medium text-slate-300">Presupuesto</span>
+                <span className="text-sm font-medium text-zinc-300">Presupuesto</span>
                 <select
                   value={form.budget}
                   onChange={(event) => updateField('budget', event.target.value)}
-                  className="rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-slate-100 outline-none transition focus:border-emerald-500/50 focus:bg-white/10"
+                  className="rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-zinc-100 outline-none transition focus:border-orange-500/50 focus:bg-white/10"
                 >
                   {['bajo', 'medio', 'alto'].map((option) => (
-                    <option key={option} value={option} className="bg-slate-900 capitalize">
+                    <option key={option} value={option} className="bg-zinc-900 capitalize">
                       {option}
                     </option>
                   ))}
@@ -668,26 +662,26 @@ function App() {
               </label>
 
               <label className="grid gap-2">
-                <span className="text-sm font-medium text-slate-300">Personas</span>
+                <span className="text-sm font-medium text-zinc-300">Personas</span>
                 <input
                   type="number"
                   min="1"
                   max="12"
                   value={form.partySize}
                   onChange={(event) => updateField('partySize', Number(event.target.value) || 1)}
-                  className="rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-slate-100 outline-none transition focus:border-emerald-500/50 focus:bg-white/10"
+                  className="rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-zinc-100 outline-none transition focus:border-orange-500/50 focus:bg-white/10"
                 />
               </label>
 
               <label className="grid gap-2">
-                <span className="text-sm font-medium text-slate-300">Accesibilidad</span>
+                <span className="text-sm font-medium text-zinc-300">Accesibilidad</span>
                 <select
                   value={form.accessibility}
                   onChange={(event) => updateField('accessibility', event.target.value)}
-                  className="rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-slate-100 outline-none transition focus:border-emerald-500/50 focus:bg-white/10"
+                  className="rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-zinc-100 outline-none transition focus:border-orange-500/50 focus:bg-white/10"
                 >
                   {['normal', 'step-free', 'low-walk', 'high-comfort'].map((option) => (
-                    <option key={option} value={option} className="bg-slate-900">
+                    <option key={option} value={option} className="bg-zinc-900">
                       {option}
                     </option>
                   ))}
@@ -698,13 +692,13 @@ function App() {
             <div className="mt-8 rounded-[1.75rem] border border-white/5 bg-white/[0.02] p-5 sm:p-6">
               <div className="flex flex-wrap items-start justify-between gap-3">
                 <div>
-                  <p className="text-xs font-semibold uppercase tracking-[0.3em] text-emerald-300">Sitios clave</p>
+                  <p className="text-xs font-semibold uppercase tracking-[0.3em] text-orange-400">Sitios clave</p>
                   <h3 className="mt-2 text-xl font-semibold text-white">Guía la inteligencia artificial</h3>
-                  <p className="mt-2 max-w-2xl text-sm leading-6 text-slate-400">
+                  <p className="mt-2 max-w-2xl text-sm leading-6 text-zinc-400">
                     Marca hasta tres lugares imprescindibles para ti. De esta manera Gemini estructurará un viaje armónico a su alrededor.
                   </p>
                 </div>
-                <div className="rounded-full border border-white/10 bg-white/5 px-4 py-2 text-xs font-medium text-slate-300">
+                <div className="rounded-full border border-white/10 bg-white/5 px-4 py-2 text-xs font-medium text-zinc-300">
                   {selectedZone?.province}
                 </div>
               </div>
@@ -723,8 +717,8 @@ function App() {
                       className={[
                         'inline-flex items-center gap-2 rounded-full border px-4 py-2 text-xs font-medium transition-all duration-300',
                         active
-                          ? 'border-emerald-400/60 bg-emerald-400/15 text-emerald-300 shadow-[0_0_15px_rgba(52,211,153,0.15)]'
-                          : 'border-white/10 bg-white/5 text-slate-300 hover:border-white/20 hover:bg-white/10',
+                          ? 'border-orange-500/60 bg-orange-500/15 text-orange-400 shadow-[0_0_15px_rgba(249,115,22,0.15)]'
+                          : 'border-white/10 bg-white/5 text-zinc-300 hover:border-white/20 hover:bg-white/10',
                         disabled ? 'cursor-not-allowed opacity-30' : 'cursor-pointer',
                       ].join(' ')}
                     >
@@ -738,13 +732,13 @@ function App() {
 
             <div className="mt-6 grid gap-2">
               <label className="grid gap-2">
-                <span className="text-sm font-medium text-slate-300">Instrucciones o contexto adicional (Opcional)</span>
+                <span className="text-sm font-medium text-zinc-300">Instrucciones o contexto adicional (Opcional)</span>
                 <textarea
                   value={form.notes}
                   onChange={(event) => updateField('notes', event.target.value)}
                   rows={3}
                   placeholder="Ej: Viaje de aniversario, buscamos probar sidrerías, preferimos evitar madrugar."
-                  className="resize-none rounded-2xl border border-white/10 bg-white/5 px-4 py-4 text-slate-100 outline-none transition placeholder:text-slate-600 focus:border-emerald-500/50 focus:bg-white/10"
+                  className="resize-none rounded-2xl border border-white/10 bg-white/5 px-4 py-4 text-zinc-100 outline-none transition placeholder:text-zinc-600 focus:border-orange-500/50 focus:bg-white/10"
                 />
               </label>
             </div>
@@ -753,7 +747,7 @@ function App() {
               <button
                 type="submit"
                 disabled={status === 'loading'}
-                className="group inline-flex items-center gap-3 rounded-full bg-emerald-400 px-7 py-3.5 text-sm font-bold text-slate-950 transition hover:bg-emerald-300 hover:shadow-[0_0_20px_rgba(52,211,153,0.3)] disabled:cursor-wait disabled:opacity-70"
+                className="group inline-flex items-center gap-3 rounded-full bg-orange-500 px-7 py-3.5 text-sm font-bold text-zinc-950 transition hover:bg-orange-400 hover:shadow-[0_0_20px_rgba(249,115,22,0.3)] disabled:cursor-wait disabled:opacity-70"
               >
                 {status === 'loading' ? (
                   <>
@@ -768,7 +762,7 @@ function App() {
                 )}
               </button>
 
-              <span className="text-sm text-slate-500">
+              <span className="text-sm text-zinc-500">
                 Modifica y regenera sin límite.
               </span>
             </div>
@@ -803,21 +797,21 @@ function App() {
           >
             <div className="flex items-center justify-between gap-3">
               <div>
-                <p className="text-xs font-semibold uppercase tracking-[0.3em] text-emerald-300">Resultado</p>
+                <p className="text-xs font-semibold uppercase tracking-[0.3em] text-orange-400">Resultado</p>
                 <h2 className="mt-2 text-2xl font-semibold text-white">Tu ruta planificada</h2>
               </div>
               {status === 'loading' ? (
-                <span className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-3 py-1.5 text-xs text-slate-300">
-                  <LoaderCircle className="h-4 w-4 animate-spin text-emerald-400" />
+                <span className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-3 py-1.5 text-xs text-zinc-300">
+                  <LoaderCircle className="h-4 w-4 animate-spin text-orange-400" />
                   Conectando...
                 </span>
               ) : result ? (
-                <span className="inline-flex items-center gap-2 rounded-full border border-emerald-500/20 bg-emerald-500/10 px-3 py-1.5 text-xs text-emerald-300">
+                <span className="inline-flex items-center gap-2 rounded-full border border-orange-500/20 bg-orange-500/10 px-3 py-1.5 text-xs text-orange-300">
                   <BadgeCheck className="h-4 w-4" />
                   {result.source}
                 </span>
               ) : (
-                <span className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-3 py-1.5 text-xs text-slate-400">
+                <span className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-3 py-1.5 text-xs text-zinc-400">
                   <Sparkles className="h-4 w-4" />
                   Esperando consulta
                 </span>
@@ -828,26 +822,26 @@ function App() {
               {result ? (
                 <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.5 }}>
                   <div className="flex items-start gap-5">
-                    <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl bg-emerald-500/15 text-emerald-300">
+                    <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl bg-orange-500/15 text-orange-400">
                       <Route className="h-7 w-7" />
                     </div>
                     <div>
                       <h3 className="text-2xl font-bold text-white">{result.itinerary?.title || 'Itinerario listo'}</h3>
-                      <p className="mt-2 text-sm leading-relaxed text-slate-300">{result.itinerary?.summary}</p>
+                      <p className="mt-2 text-sm leading-relaxed text-zinc-300">{result.itinerary?.summary}</p>
                     </div>
                   </div>
 
                   <div className="mt-8 grid gap-4 sm:grid-cols-3">
                     <div className="rounded-2xl border border-white/5 bg-white/[0.03] p-5">
-                      <p className="text-[10px] font-semibold uppercase tracking-[0.25em] text-slate-500">Zona</p>
+                      <p className="text-[10px] font-semibold uppercase tracking-[0.25em] text-zinc-500">Zona</p>
                       <p className="mt-2 font-medium text-white">{result.catalogSummary?.selectedZone || selectedZone?.label}</p>
                     </div>
                     <div className="rounded-2xl border border-white/5 bg-white/[0.03] p-5">
-                      <p className="text-[10px] font-semibold uppercase tracking-[0.25em] text-slate-500">Sitios</p>
+                      <p className="text-[10px] font-semibold uppercase tracking-[0.25em] text-zinc-500">Sitios</p>
                       <p className="mt-2 font-medium text-white">{result.catalogSummary?.places ?? 0}</p>
                     </div>
                     <div className="rounded-2xl border border-white/5 bg-white/[0.03] p-5">
-                      <p className="text-[10px] font-semibold uppercase tracking-[0.25em] text-slate-500">Eventos</p>
+                      <p className="text-[10px] font-semibold uppercase tracking-[0.25em] text-zinc-500">Eventos</p>
                       <p className="mt-2 font-medium text-white">{result.catalogSummary?.events ?? 0}</p>
                     </div>
                   </div>
@@ -856,7 +850,7 @@ function App() {
                     {Array.isArray(result.itinerary?.days) && result.itinerary.days.length ? (
                       result.itinerary.days.map((day, index) => <DayCard key={`${day.date}-${index}`} day={day} index={index} />)
                     ) : (
-                      <div className="rounded-3xl border border-white/5 bg-white/[0.03] p-6 text-center text-slate-400">
+                      <div className="rounded-3xl border border-white/5 bg-white/[0.03] p-6 text-center text-zinc-400">
                         Los detalles del viaje aparecerán aquí.
                       </div>
                     )}
@@ -864,10 +858,10 @@ function App() {
 
                   <div className="mt-8 grid gap-5 md:grid-cols-2">
                     <div className="rounded-3xl border border-white/5 bg-white/[0.03] p-6">
-                      <p className="text-xs font-semibold uppercase tracking-[0.25em] text-emerald-300">Tips de equipaje</p>
+                      <p className="text-xs font-semibold uppercase tracking-[0.25em] text-orange-400">Tips de equipaje</p>
                       <div className="mt-4 flex flex-wrap gap-2">
                         {(result.itinerary?.packingTips || []).map((tip) => (
-                          <span key={tip} className="rounded-full border border-white/10 bg-white/5 px-3 py-1.5 text-xs text-slate-300">
+                          <span key={tip} className="rounded-full border border-white/10 bg-white/5 px-3 py-1.5 text-xs text-zinc-300">
                             {tip}
                           </span>
                         ))}
@@ -875,11 +869,11 @@ function App() {
                     </div>
 
                     <div className="rounded-3xl border border-white/5 bg-white/[0.03] p-6">
-                      <p className="text-xs font-semibold uppercase tracking-[0.25em] text-rose-300">Plan B</p>
-                      <ul className="mt-4 space-y-3 text-sm text-slate-300">
+                      <p className="text-xs font-semibold uppercase tracking-[0.25em] text-rose-400">Plan B</p>
+                      <ul className="mt-4 space-y-3 text-sm text-zinc-300">
                         {(result.itinerary?.backupPlan || []).map((item) => (
                           <li key={item} className="flex gap-3 leading-relaxed">
-                            <span className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-rose-400/80" />
+                            <span className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-rose-500/80" />
                             <span>{item}</span>
                           </li>
                         ))}
@@ -889,12 +883,12 @@ function App() {
 
                   <div className="mt-5 rounded-3xl border border-white/5 bg-white/[0.03] p-6">
                     <p className="flex items-center gap-2 text-sm font-semibold text-white">
-                      <MapPin className="h-4 w-4 text-emerald-300" />
+                      <MapPin className="h-4 w-4 text-orange-400" />
                       Transporte y contexto
                     </p>
                     <div className="mt-4 flex flex-wrap gap-2">
                       {(result.itinerary?.transportNotes || []).map((item) => (
-                        <span key={item} className="rounded-full border border-white/10 bg-slate-900/50 px-4 py-1.5 text-xs text-slate-300">
+                        <span key={item} className="rounded-full border border-white/10 bg-zinc-900/50 px-4 py-1.5 text-xs text-zinc-300">
                           {item}
                         </span>
                       ))}
@@ -904,29 +898,29 @@ function App() {
               ) : (
                 <div className="grid gap-6">
                   <div className="rounded-3xl border border-white/5 bg-white/[0.03] p-8">
-                    <p className="text-xs font-semibold uppercase tracking-[0.25em] text-emerald-300">Cómo funciona</p>
-                    <div className="mt-6 space-y-6 text-sm text-slate-300">
+                    <p className="text-xs font-semibold uppercase tracking-[0.25em] text-orange-400">Cómo funciona</p>
+                    <div className="mt-6 space-y-6 text-sm text-zinc-300">
                       <div className="flex gap-4">
-                        <div className="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-emerald-500/15 font-semibold text-emerald-300">1</div>
+                        <div className="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-orange-500/15 font-semibold text-orange-400">1</div>
                         <p className="pt-1.5">Navega por el mapa de arriba y elige la zona que servirá como centro base.</p>
                       </div>
                       <div className="flex gap-4">
-                        <div className="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-emerald-500/15 font-semibold text-emerald-300">2</div>
+                        <div className="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-orange-500/15 font-semibold text-orange-400">2</div>
                         <p className="pt-1.5">Personaliza filtros, marca hasta tres sitios favoritos y añade el contexto extra.</p>
                       </div>
                       <div className="flex gap-4">
-                        <div className="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-emerald-500/15 font-semibold text-emerald-300">3</div>
-                        <p className="pt-1.5">Pulsa <span className="font-semibold text-emerald-100">Generar Itinerario</span> para desatar la magia de la inteligencia artificial.</p>
+                        <div className="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-orange-500/15 font-semibold text-orange-400">3</div>
+                        <p className="pt-1.5">Pulsa <span className="font-semibold text-orange-200">Generar Itinerario</span> para desatar la magia de la inteligencia artificial.</p>
                       </div>
                     </div>
                   </div>
 
                   <div className="rounded-3xl border border-white/5 bg-white/[0.03] p-6">
                     <p className="flex items-center gap-2 text-sm font-semibold text-white">
-                      <WandSparkles className="h-4 w-4 text-emerald-300" />
+                      <WandSparkles className="h-4 w-4 text-orange-400" />
                       Ideas para probar
                     </p>
-                    <div className="mt-4 flex flex-wrap gap-2 text-xs font-medium text-slate-400">
+                    <div className="mt-4 flex flex-wrap gap-2 text-xs font-medium text-zinc-400">
                       <span className="rounded-full border border-white/10 bg-white/5 px-4 py-2">Prueba "Transporte público" vs "Coche"</span>
                       <span className="rounded-full border border-white/10 bg-white/5 px-4 py-2">Viaje lento vs Acelerado</span>
                     </div>
