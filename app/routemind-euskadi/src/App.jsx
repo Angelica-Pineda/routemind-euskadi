@@ -1,23 +1,22 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useState, useRef } from 'react'
 import { AnimatePresence, motion } from 'framer-motion'
 import L from 'leaflet'
-import {
-  ArrowRight,
-  BadgeCheck,
-  BrainCircuit,
-  CircleAlert,
-  CloudSun,
-  Compass,
-  LoaderCircle,
-  LocateFixed,
-  MapPin,
-  Route,
-  Sparkles,
-  ExternalLink,
-  Mail,
-  WandSparkles,
-  ChevronDown,
-} from 'lucide-react'
+import { 
+  RiArrowRightLine, 
+  RiVerifiedBadgeFill, 
+  RiErrorWarningLine, 
+  RiLoader4Line, 
+  RiFocus3Line, 
+  RiMapPin2Line, 
+  RiRouteLine, 
+  RiSparklingFill, 
+  RiExternalLinkLine, 
+  RiMailSendLine, 
+  RiMagicLine, 
+  RiArrowDownSLine,
+  RiLinkedinFill,
+  RiGithubFill
+} from 'react-icons/ri'
 import { paceOptions, preferenceOptions, siteOptions, transportOptions, zoneOptions } from '../shared/catalog.js'
 import { MapContainer, Marker, Popup, TileLayer } from 'react-leaflet'
 import { requestApiHealth, requestItinerary } from './lib/plannerClient.js'
@@ -68,53 +67,50 @@ const initialFormState = {
   sites: ['guggenheim-bilbao', 'casco-viejo-bilbao'],
 }
 
-const heroMetrics = [
+const heroCards = [
   {
-    icon: BrainCircuit,
-    title: 'Explora sin fricción',
-    text: 'Empieza por una zona y deja que la app te guíe a sitios coherentes con ese territorio.',
+    title: 'TERRITORIO\nA\nMEDIDA',
+    text: 'Explora sin fricción',
+    video: '/hero-video1.mp4',
   },
   {
-    icon: Compass,
-    title: 'Selecciona tus sitios',
-    text: 'Combina lugares principales, eventos y puntos de interés sin saturar la experiencia.',
+    title: 'RITMO\nY\nEQUILIBRIO',
+    text: 'Combina sitios clave',
+    video: '/hero-video2.mp4',
   },
   {
-    icon: CloudSun,
-    title: 'Genera cuando quieras',
-    text: 'Puedes ajustar la zona y volver a crear el itinerario tantas veces como desees.',
+    title: 'VIAJA\nEN\nLIBERTAD',
+    text: 'Genera sin límites',
+    video: '/hero-video3.mp4',
   },
 ]
 
-function MetricCard({ icon: Icon, title, text }) {
+function WindowVideoCard({ title, text, video }) {
   return (
-    <div className="group rounded-3xl border border-white/5 bg-white/[0.02] p-6 backdrop-blur-xl transition duration-300 hover:border-orange-500/30 hover:bg-white/[0.05]">
-      <div className="flex flex-col gap-4">
-        <div className="inline-flex h-12 w-12 items-center justify-center rounded-2xl bg-orange-500/10 text-orange-400 transition-transform duration-300 group-hover:-translate-y-1 group-hover:bg-orange-500/20">
-          <Icon className="h-6 w-6" />
-        </div>
-        <div>
-          <h3 className="text-base font-semibold text-white">{title}</h3>
-          <p className="mt-2 text-sm leading-relaxed text-zinc-400">{text}</p>
+    <div className="group relative flex h-[340px] w-[260px] flex-col justify-center overflow-hidden rounded-t-[10rem] rounded-b-[2rem] border border-white/10 bg-zinc-900 shadow-2xl transition-all duration-700 hover:-translate-y-2 hover:border-orange-500/40 hover:shadow-[0_20px_40px_rgba(249,115,22,0.15)] sm:h-[400px] sm:w-[280px]">
+      <video
+        src={video}
+        autoPlay
+        loop
+        muted
+        playsInline
+        className="absolute inset-0 h-full w-full object-cover transition-transform duration-[2000ms] group-hover:scale-110"
+      />
+      <div className="absolute inset-0 bg-black/30 transition-colors duration-700 group-hover:bg-black/50" />
+      
+      <div className="relative z-10 flex flex-col items-center p-6 text-center">
+        <h3 className="font-heading text-3xl font-light tracking-widest text-white drop-shadow-lg sm:text-4xl">
+          {title.split('\n').map((line, i) => (
+            <span key={i} className="block">{line}</span>
+          ))}
+        </h3>
+        <div className="mt-6 overflow-hidden">
+          <p className="translate-y-full text-[10px] uppercase tracking-[0.3em] text-zinc-100 opacity-0 transition-all duration-500 group-hover:translate-y-0 group-hover:opacity-100">
+            {text}
+          </p>
         </div>
       </div>
     </div>
-  )
-}
-
-function LinkedinMark() {
-  return (
-    <svg viewBox="0 0 24 24" aria-hidden="true" className="h-4 w-4 fill-current">
-      <path d="M19.5 3H4.5A1.5 1.5 0 0 0 3 4.5v15A1.5 1.5 0 0 0 4.5 21h15a1.5 1.5 0 0 0 1.5-1.5v-15A1.5 1.5 0 0 0 19.5 3ZM8.25 18H5.5v-8.5h2.75V18ZM6.88 8.46A1.61 1.61 0 1 1 6.9 5.24a1.61 1.61 0 0 1-.02 3.22ZM18 18h-2.75v-4.14c0-1-.02-2.27-1.38-2.27-1.38 0-1.59 1.08-1.59 2.19V18H9.53v-8.5h2.64v1.16h.04c.37-.7 1.27-1.45 2.61-1.45 2.8 0 3.32 1.84 3.32 4.23V18Z"/>
-    </svg>
-  )
-}
-
-function GithubMark() {
-  return (
-    <svg viewBox="0 0 24 24" aria-hidden="true" className="h-4 w-4 fill-current">
-      <path d="M12 2C6.48 2 2 6.58 2 12.24c0 4.52 2.87 8.35 6.84 9.7.5.1.68-.22.68-.49v-1.72c-2.78.62-3.37-1.17-3.37-1.17-.46-1.2-1.12-1.52-1.12-1.52-.92-.65.07-.64.07-.64 1.02.07 1.56 1.07 1.56 1.07.9 1.59 2.36 1.13 2.93.86.09-.67.35-1.13.64-1.39-2.22-.26-4.56-1.13-4.56-5.05 0-1.12.39-2.04 1.03-2.76-.11-.26-.45-1.31.1-2.72 0 0 .84-.28 2.75 1.06a9.12 9.12 0 0 1 5 0c1.91-1.34 2.75-1.06 2.75-1.06.55 1.41.21 2.46.1 2.72.64.72 1.03 1.64 1.03 2.76 0 3.93-2.34 4.79-4.57 5.04.36.32.68.95.68 1.92v2.84c0 .27.18.59.69.49A10.26 10.26 0 0 0 22 12.24C22 6.58 17.52 2 12 2Z"/>
-    </svg>
   )
 }
 
@@ -136,6 +132,35 @@ function createZoneMarkerIcon(active) {
   })
 }
 
+function ZoneMarker({ zone, active, onSelect }) {
+  const markerRef = useRef(null)
+
+  useEffect(() => {
+    if (active && markerRef.current) {
+      setTimeout(() => {
+        markerRef.current.openPopup()
+      }, 100) // Ligero retraso para asegurar fluidez de Leaflet
+    }
+  }, [active])
+
+  return (
+    <Marker
+      position={zone.center}
+      icon={createZoneMarkerIcon(active)}
+      eventHandlers={{ click: () => onSelect(zone.id) }}
+      ref={markerRef}
+    >
+      <Popup>
+        <div className="max-w-[220px]">
+          <p className="text-xs uppercase tracking-[0.2em] text-zinc-500">{zone.shortLabel}</p>
+          <h4 className="mt-1 text-sm font-semibold text-zinc-900">{zone.label}</h4>
+          <p className="mt-2 text-sm text-zinc-700">{zone.summary}</p>
+        </div>
+      </Popup>
+    </Marker>
+  )
+}
+
 function MapZonePreview({ selectedZone, onSelectZone }) {
   const mapCenter = selectedZone?.center ?? zoneOptions[0].center
 
@@ -147,7 +172,7 @@ function MapZonePreview({ selectedZone, onSelectZone }) {
           <h3 className="mt-2 text-xl font-semibold text-white">Selecciona la zona con el mapa o con la lista</h3>
         </div>
         <div className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-3 py-1.5 text-xs text-zinc-300">
-          <LocateFixed className="h-3.5 w-3.5 text-orange-400" />
+          <RiFocus3Line className="h-3.5 w-3.5 text-orange-400" />
           {selectedZone?.label}
         </div>
       </div>
@@ -159,25 +184,14 @@ function MapZonePreview({ selectedZone, onSelectZone }) {
               attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
               url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
             />
-            {zoneOptions.map((zone) => {
-              const active = selectedZone?.id === zone.id
-              return (
-                <Marker
-                  key={zone.id}
-                  position={zone.center}
-                  icon={createZoneMarkerIcon(active)}
-                  eventHandlers={{ click: () => onSelectZone(zone.id) }}
-                >
-                  <Popup>
-                    <div className="max-w-[220px]">
-                      <p className="text-xs uppercase tracking-[0.2em] text-zinc-500">{zone.shortLabel}</p>
-                      <h4 className="mt-1 text-sm font-semibold text-zinc-900">{zone.label}</h4>
-                      <p className="mt-2 text-sm text-zinc-700">{zone.summary}</p>
-                    </div>
-                  </Popup>
-                </Marker>
-              )
-            })}
+            {zoneOptions.map((zone) => (
+              <ZoneMarker 
+                key={zone.id} 
+                zone={zone} 
+                active={selectedZone?.id === zone.id} 
+                onSelect={onSelectZone} 
+              />
+            ))}
           </MapContainer>
         </div>
 
@@ -192,7 +206,8 @@ function MapZonePreview({ selectedZone, onSelectZone }) {
             </span>
           </div>
 
-          <div className="mt-4 grid max-h-[26rem] gap-3 overflow-y-auto pr-1 lg:max-h-[32rem]">
+          {/* Scroll invisible */}
+          <div className="mt-4 grid max-h-[26rem] gap-3 overflow-y-auto lg:max-h-[32rem] [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
             {zoneOptions.map((zone) => (
               <button
                 key={zone.id}
@@ -260,9 +275,9 @@ function Footer() {
                     rel="noreferrer"
                     className="footer-link group flex items-center gap-3 text-zinc-300 transition hover:text-white"
                   >
-                    <span className="footer-link-icon text-orange-400"><LinkedinMark /></span>
+                    <span className="footer-link-icon text-orange-400"><RiLinkedinFill className="h-5 w-5" /></span>
                     <span className="border-b border-transparent pb-0.5 transition group-hover:border-orange-500/50">LinkedIn</span>
-                    <ExternalLink className="h-3.5 w-3.5 text-zinc-500 transition group-hover:text-orange-400" />
+                    <RiExternalLinkLine className="h-3.5 w-3.5 text-zinc-500 transition group-hover:text-orange-400" />
                   </a>
                 </li>
                 <li>
@@ -272,9 +287,9 @@ function Footer() {
                     rel="noreferrer"
                     className="footer-link group flex items-center gap-3 text-zinc-300 transition hover:text-white"
                   >
-                    <span className="footer-link-icon text-orange-400"><GithubMark /></span>
+                    <span className="footer-link-icon text-orange-400"><RiGithubFill className="h-5 w-5" /></span>
                     <span className="border-b border-transparent pb-0.5 transition group-hover:border-orange-500/50">GitHub</span>
-                    <ExternalLink className="h-3.5 w-3.5 text-zinc-500 transition group-hover:text-orange-400" />
+                    <RiExternalLinkLine className="h-3.5 w-3.5 text-zinc-500 transition group-hover:text-orange-400" />
                   </a>
                 </li>
                 <li>
@@ -283,7 +298,7 @@ function Footer() {
                     className="footer-link group flex items-center gap-3 text-zinc-300 transition hover:text-white"
                   >
                     <span className="footer-link-icon text-orange-400">
-                      <Mail className="h-4 w-4" />
+                      <RiMailSendLine className="h-5 w-5" />
                     </span>
                     <span className="border-b border-transparent pb-0.5 transition group-hover:border-orange-500/50">angelicap2298@gmail.com</span>
                   </a>
@@ -299,9 +314,9 @@ function Footer() {
                 rel="noreferrer"
                 className="footer-link group mt-4 flex items-center gap-3 text-sm text-zinc-300 transition hover:text-white"
               >
-                <span className="footer-link-icon text-orange-400"><Route className="h-4 w-4" /></span>
+                <span className="footer-link-icon text-orange-400"><RiRouteLine className="h-5 w-5" /></span>
                 <span className="border-b border-transparent pb-0.5 transition group-hover:border-orange-500/50">Repositorio del proyecto</span>
-                <ExternalLink className="h-3.5 w-3.5 text-zinc-500 transition group-hover:text-orange-400" />
+                <RiExternalLinkLine className="h-3.5 w-3.5 text-zinc-500 transition group-hover:text-orange-400" />
               </a>
               <p className="mt-3 text-xs leading-6 text-zinc-400">
                 Código, estructura y evolución completa del proyecto.
@@ -454,10 +469,10 @@ function App() {
   return (
     <div className="relative min-h-screen bg-zinc-950 font-sans text-zinc-100 selection:bg-orange-500/30 selection:text-orange-100">
       
-      {/* HEADER HERO (100dvh) */}
-      <header className="relative flex h-[100dvh] min-h-[600px] w-full flex-col justify-between overflow-hidden">
+      {/* HEADER HERO (Ocupa mínimo el alto de pantalla, pero se adapta al contenido) */}
+      <header className="relative flex min-h-[100dvh] w-full flex-col justify-between overflow-hidden pb-12">
         
-        {/* Fondo Ikurriña con overlay estilo Hierro y Piedra */}
+        {/* Fondo Ikurriña */}
         <div className="absolute inset-0 z-0">
           <img 
             src="/Flag.svg" 
@@ -479,7 +494,7 @@ function App() {
             </span>
           </div>
           <div className="inline-flex items-center gap-2 rounded-full border border-orange-500/20 bg-orange-500/10 px-3 py-1.5 text-[11px] font-medium text-orange-300 backdrop-blur-md">
-            <BadgeCheck className="h-3.5 w-3.5" />
+            <RiVerifiedBadgeFill className="h-4 w-4" />
             {health.label}
           </div>
         </div>
@@ -489,7 +504,7 @@ function App() {
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, ease: "easeOut" }}
-          className="relative z-10 mx-auto flex w-full max-w-5xl flex-1 flex-col justify-center px-4 text-center sm:px-6"
+          className="relative z-10 mx-auto mt-6 flex w-full max-w-5xl flex-col justify-center px-4 text-center sm:mt-10 sm:px-6"
         >
           <h1 className="font-heading text-5xl font-bold tracking-tight text-white sm:text-7xl lg:text-8xl">
             Descubre Euskadi <br className="hidden sm:block" />
@@ -501,26 +516,26 @@ function App() {
             Genera itinerarios vivos, visuales y adaptados a tus gustos. Planificación turística inteligente lista para repetirse cuantas veces quieras.
           </p>
           
-          <div className="mt-10 flex justify-center">
+          <div className="mt-8 flex justify-center sm:mt-10">
             <button 
               onClick={scrollToMap}
               className="group flex h-14 w-14 items-center justify-center rounded-full border border-white/10 bg-white/5 backdrop-blur-md transition-all hover:border-orange-500/40 hover:bg-white/10"
             >
-              <ChevronDown className="h-6 w-6 text-orange-400 transition-transform group-hover:translate-y-1" />
+              <RiArrowDownSLine className="h-6 w-6 text-orange-400 transition-transform group-hover:translate-y-1" />
             </button>
           </div>
         </motion.div>
 
-        {/* Float Cards */}
+        {/* Arch Cards con Vídeos */}
         <motion.div 
           initial={{ opacity: 0, y: 40 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, delay: 0.2, ease: "easeOut" }}
-          className="relative z-10 w-full pb-8 pt-4"
+          className="relative z-10 mt-12 w-full sm:mt-16"
         >
-          <div className="mx-auto grid max-w-6xl grid-cols-1 gap-4 px-4 sm:grid-cols-3 sm:px-6 lg:px-8">
-            {heroMetrics.map((metric) => (
-              <MetricCard key={metric.title} {...metric} />
+          <div className="mx-auto flex max-w-6xl flex-wrap justify-center gap-6 px-4 sm:gap-8 lg:px-8">
+            {heroCards.map((card) => (
+              <WindowVideoCard key={card.title} {...card} />
             ))}
           </div>
         </motion.div>
@@ -545,7 +560,7 @@ function App() {
                 <h2 className="mt-2 text-2xl font-semibold text-white">Tu base territorial para este viaje</h2>
               </div>
               <div className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-4 py-2 text-xs font-medium text-zinc-200">
-                <LocateFixed className="h-4 w-4 text-orange-400" />
+                <RiFocus3Line className="h-4 w-4 text-orange-400" />
                 {selectedZone?.label}
               </div>
             </div>
@@ -722,7 +737,7 @@ function App() {
                         disabled ? 'cursor-not-allowed opacity-30' : 'cursor-pointer',
                       ].join(' ')}
                     >
-                      <MapPin className="h-3.5 w-3.5" />
+                      <RiMapPin2Line className="h-4 w-4" />
                       {site.label}
                     </button>
                   )
@@ -751,13 +766,13 @@ function App() {
               >
                 {status === 'loading' ? (
                   <>
-                    <LoaderCircle className="h-5 w-5 animate-spin" />
+                    <RiLoader4Line className="h-5 w-5 animate-spin" />
                     Generando magia...
                   </>
                 ) : (
                   <>
                     Generar Itinerario
-                    <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
+                    <RiArrowRightLine className="h-5 w-5 transition-transform group-hover:translate-x-1" />
                   </>
                 )}
               </button>
@@ -777,7 +792,7 @@ function App() {
                   className="overflow-hidden rounded-2xl border border-rose-500/20 bg-rose-500/10 p-5 text-sm text-rose-200"
                 >
                   <div className="flex items-start gap-3">
-                    <CircleAlert className="mt-0.5 h-5 w-5 shrink-0" />
+                    <RiErrorWarningLine className="mt-0.5 h-6 w-6 shrink-0" />
                     <div>
                       <p className="font-semibold text-rose-100">Algo no ha ido bien</p>
                       <p className="mt-1 text-rose-300/80">{error}</p>
@@ -802,17 +817,17 @@ function App() {
               </div>
               {status === 'loading' ? (
                 <span className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-3 py-1.5 text-xs text-zinc-300">
-                  <LoaderCircle className="h-4 w-4 animate-spin text-orange-400" />
+                  <RiLoader4Line className="h-4 w-4 animate-spin text-orange-400" />
                   Conectando...
                 </span>
               ) : result ? (
                 <span className="inline-flex items-center gap-2 rounded-full border border-orange-500/20 bg-orange-500/10 px-3 py-1.5 text-xs text-orange-300">
-                  <BadgeCheck className="h-4 w-4" />
+                  <RiVerifiedBadgeFill className="h-4 w-4" />
                   {result.source}
                 </span>
               ) : (
                 <span className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-3 py-1.5 text-xs text-zinc-400">
-                  <Sparkles className="h-4 w-4" />
+                  <RiSparklingFill className="h-4 w-4" />
                   Esperando consulta
                 </span>
               )}
@@ -823,7 +838,7 @@ function App() {
                 <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.5 }}>
                   <div className="flex items-start gap-5">
                     <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl bg-orange-500/15 text-orange-400">
-                      <Route className="h-7 w-7" />
+                      <RiRouteLine className="h-7 w-7" />
                     </div>
                     <div>
                       <h3 className="text-2xl font-bold text-white">{result.itinerary?.title || 'Itinerario listo'}</h3>
@@ -846,7 +861,8 @@ function App() {
                     </div>
                   </div>
 
-                  <div className="mt-8 max-h-[45rem] space-y-5 overflow-y-auto pr-2 scrollbar-thin scrollbar-track-transparent scrollbar-thumb-white/10">
+                  {/* Scroll invisible */}
+                  <div className="mt-8 max-h-[45rem] space-y-5 overflow-y-auto [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
                     {Array.isArray(result.itinerary?.days) && result.itinerary.days.length ? (
                       result.itinerary.days.map((day, index) => <DayCard key={`${day.date}-${index}`} day={day} index={index} />)
                     ) : (
@@ -883,7 +899,7 @@ function App() {
 
                   <div className="mt-5 rounded-3xl border border-white/5 bg-white/[0.03] p-6">
                     <p className="flex items-center gap-2 text-sm font-semibold text-white">
-                      <MapPin className="h-4 w-4 text-orange-400" />
+                      <RiMapPin2Line className="h-5 w-5 text-orange-400" />
                       Transporte y contexto
                     </p>
                     <div className="mt-4 flex flex-wrap gap-2">
@@ -917,7 +933,7 @@ function App() {
 
                   <div className="rounded-3xl border border-white/5 bg-white/[0.03] p-6">
                     <p className="flex items-center gap-2 text-sm font-semibold text-white">
-                      <WandSparkles className="h-4 w-4 text-orange-400" />
+                      <RiMagicLine className="h-5 w-5 text-orange-400" />
                       Ideas para probar
                     </p>
                     <div className="mt-4 flex flex-wrap gap-2 text-xs font-medium text-zinc-400">
