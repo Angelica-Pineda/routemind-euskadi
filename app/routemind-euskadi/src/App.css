@@ -127,3 +127,9 @@
 .footer-link:hover .footer-link-icon {
   transform: translateX(2px);
 }
+
+.forzar-calendario > div {
+  opacity: 1 !important;
+  visibility: visible !important;
+  transform: none !important;
+}

@@ -13,7 +13,6 @@ import {
   RiExternalLinkLine, 
   RiMailSendLine, 
   RiMagicLine, 
-  RiArrowDownSLine,
   RiLinkedinFill,
   RiGithubFill
 } from 'react-icons/ri'
@@ -22,6 +21,8 @@ import { MapContainer, Marker, Popup, TileLayer } from 'react-leaflet'
 import { requestApiHealth, requestItinerary } from './lib/plannerClient.js'
 import './App.css'
 import 'leaflet/dist/leaflet.css'
+import { CustomSelect } from './components/ui/CustomSelect'
+import { CustomDatePicker } from './components/ui/CustomDatePicker'
 
 function formatDateInput(date) {
   return date.toISOString().slice(0, 10)
@@ -52,25 +53,25 @@ const defaultStartDate = formatDateInput(new Date())
 const defaultEndDate = formatDateInput(addDays(new Date(), 2))
 const maxDate = formatDateInput(addMonths(new Date(), 3))
 
-const initialFormState = {
-  startDate: defaultStartDate,
-  endDate: defaultEndDate,
-  zone: 'bilbao-metro',
-  preference: 'indiferente',
-  transport: 'publico',
-  pace: 'equilibrado',
-  budget: 'medio',
-  partySize: 2,
-  accessibility: 'normal',
-  focus: 'equilibrio',
-  notes: '',
-  sites: ['guggenheim-bilbao', 'casco-viejo-bilbao'],
-}
+// const initialFormState = {
+//   startDate: defaultStartDate,
+//   endDate: defaultEndDate,
+//   zone: 'bilbao-metro',
+//   preference: 'indiferente',
+//   transport: 'publico',
+//   pace: 'equilibrado',
+//   budget: 'medio',
+//   partySize: 2,
+//   accessibility: 'normal',
+//   focus: 'equilibrio',
+//   notes: '',
+//   sites: ['guggenheim-bilbao', 'casco-viejo-bilbao'],
+// }
 
 const heroCards = [
   {
-    title: 'TERRITORIO\nA\nMEDIDA',
-    text: 'Explora sin fricción',
+    title: 'TERRITORIO A TU MEDIDA',
+    text: 'Explora sin preocupaciones',
     video: '/hero-video1.mp4',
   },
   {
@@ -79,15 +80,28 @@ const heroCards = [
     video: '/hero-video2.mp4',
   },
   {
-    title: 'VIAJA\nEN\nLIBERTAD',
-    text: 'Genera sin límites',
+    title: 'VIAJA COMO QUIERAS',
+    text: 'Genera tus itinerarios',
     video: '/hero-video3.mp4',
   },
 ]
 
+const initialFormState = {
+  dateRange: { startDate: null, endDate: null },
+  zone: 'bilbao-metro',
+  preference: '', // Empezamos en vacío para forzar la interacción secuencial
+  transport: '',
+  pace: '',
+  budget: '',
+  partySize: '',
+  accessibility: '',
+  notes: '',
+  sites: ['guggenheim-bilbao', 'casco-viejo-bilbao'],
+}
+
 function WindowVideoCard({ title, text, video }) {
   return (
-    <div className="group relative flex h-[340px] w-[260px] flex-col justify-center overflow-hidden rounded-t-[10rem] rounded-b-[2rem] border border-white/10 bg-zinc-900 shadow-2xl transition-all duration-700 hover:-translate-y-2 hover:border-orange-500/40 hover:shadow-[0_20px_40px_rgba(249,115,22,0.15)] sm:h-[400px] sm:w-[280px]">
+    <div className="group relative flex h-[280px] w-[220px] shrink-0 snap-center flex-col justify-center overflow-hidden rounded-t-[8rem] rounded-b-[2rem] border border-white/10 bg-zinc-900 shadow-2xl transition-all duration-700 hover:-translate-y-2 hover:border-orange-500/40 hover:shadow-[0_20px_40px_rgba(249,115,22,0.15)] sm:h-[340px] sm:w-[260px] sm:rounded-t-[10rem]">
       <video
         src={video}
         autoPlay
@@ -99,12 +113,12 @@ function WindowVideoCard({ title, text, video }) {
       <div className="absolute inset-0 bg-black/30 transition-colors duration-700 group-hover:bg-black/50" />
       
       <div className="relative z-10 flex flex-col items-center p-6 text-center">
-        <h3 className="font-heading text-3xl font-light tracking-widest text-white drop-shadow-lg sm:text-4xl">
+        <h3 className="font-heading text-2xl font-light tracking-widest text-white drop-shadow-lg sm:text-3xl">
           {title.split('\n').map((line, i) => (
             <span key={i} className="block">{line}</span>
           ))}
         </h3>
-        <div className="mt-6 overflow-hidden">
+        <div className="mt-4 overflow-hidden">
           <p className="translate-y-full text-[10px] uppercase tracking-[0.3em] text-zinc-100 opacity-0 transition-all duration-500 group-hover:translate-y-0 group-hover:opacity-100">
             {text}
           </p>
@@ -139,7 +153,7 @@ function ZoneMarker({ zone, active, onSelect }) {
     if (active && markerRef.current) {
       setTimeout(() => {
         markerRef.current.openPopup()
-      }, 100) // Ligero retraso para asegurar fluidez de Leaflet
+      }, 100)
     }
   }, [active])
 
@@ -206,7 +220,6 @@ function MapZonePreview({ selectedZone, onSelectZone }) {
             </span>
           </div>
 
-          {/* Scroll invisible */}
           <div className="mt-4 grid max-h-[26rem] gap-3 overflow-y-auto lg:max-h-[32rem] [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
             {zoneOptions.map((zone) => (
               <button
@@ -408,7 +421,7 @@ function App() {
     [selectedZone]
   )
 
-  const tripDurationDays = useMemo(() => getDateSpan(form.startDate, form.endDate), [form.startDate, form.endDate])
+  // const tripDurationDays = useMemo(() => getDateSpan(form.startDate, form.endDate), [form.startDate, form.endDate])
 
   useEffect(() => {
     let cancelled = false
@@ -448,12 +461,20 @@ function App() {
     })
   }
 
+  const tripDurationDays = useMemo(() => getDateSpan(form.dateRange?.startDate, form.dateRange?.endDate), [form.dateRange])
+
   async function handleSubmit(event) {
     event.preventDefault()
     setStatus('loading')
     setError('')
     try {
-      const payload = await requestItinerary(form)
+      // Re-aplanamos las fechas para que tu API reciba lo que espera
+      const payloadToSubmit = {
+        ...form,
+        startDate: form.dateRange.startDate,
+        endDate: form.dateRange.endDate
+      }
+      const payload = await requestItinerary(payloadToSubmit)
       setResult(payload)
       setStatus('success')
     } catch (requestError) {
@@ -462,15 +483,25 @@ function App() {
     }
   }
 
-  const scrollToMap = () => {
-    document.getElementById('mapa-zonas')?.scrollIntoView({ behavior: 'smooth' })
-  }
+  // Lógica para determinar qué campo debe estar activo/sugerido
+  const formSequence = [
+    'dateRange', 'preference', 'transport', 'pace', 
+    'budget', 'partySize', 'accessibility'
+  ];
+
+  const currentStepIndex = formSequence.findIndex(key => {
+    if (key === 'dateRange') return !form.dateRange?.startDate || !form.dateRange?.endDate;
+    return !form[key];
+  });
+  
+  // Si todo está lleno, será -1. Lo mapeamos a la longitud total.
+  const activeStep = currentStepIndex === -1 ? formSequence.length : currentStepIndex;
 
   return (
     <div className="relative min-h-screen bg-zinc-950 font-sans text-zinc-100 selection:bg-orange-500/30 selection:text-orange-100">
       
-      {/* HEADER HERO (Ocupa mínimo el alto de pantalla, pero se adapta al contenido) */}
-      <header className="relative flex min-h-[100dvh] w-full flex-col justify-between overflow-hidden pb-12">
+      {/* HEADER HERO (Ocupa exactamente el alto de la pantalla) */}
+      <header className="relative flex h-[100dvh] w-full flex-col justify-between overflow-hidden">
         
         {/* Fondo Ikurriña */}
         <div className="absolute inset-0 z-0">
@@ -484,7 +515,7 @@ function App() {
         </div>
 
         {/* Navbar */}
-        <div className="relative z-10 flex w-full items-center justify-between p-6 sm:p-8 lg:px-12">
+        <div className="relative z-10 flex w-full shrink-0 items-center justify-between p-5 sm:p-8 lg:px-12">
           <div className="flex items-center gap-3">
             <div className="overflow-hidden rounded-lg border border-white/10 p-0.5 shadow-lg">
               <EuskadiFlag />
@@ -493,47 +524,51 @@ function App() {
               RouteMind
             </span>
           </div>
-          <div className="inline-flex items-center gap-2 rounded-full border border-orange-500/20 bg-orange-500/10 px-3 py-1.5 text-[11px] font-medium text-orange-300 backdrop-blur-md">
-            <RiVerifiedBadgeFill className="h-4 w-4" />
-            {health.label}
-          </div>
+          
+          {/* Tag Github Link (Creativo y con pulso) */}
+          <a
+            href="https://github.com/Angelica-Pineda/routemind-euskadi"
+            target="_blank"
+            rel="noreferrer"
+            className="group relative inline-flex items-center gap-2.5 rounded-full border border-white/10 bg-white/5 px-4 py-2 text-[11px] font-medium text-zinc-300 backdrop-blur-md transition-all hover:border-orange-500/40 hover:bg-orange-500/10 hover:text-orange-300"
+          >
+            <span className="relative flex h-2 w-2">
+              <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-orange-400 opacity-75"></span>
+              <span className="relative inline-flex h-2 w-2 rounded-full bg-orange-500"></span>
+            </span>
+            <span className="hidden sm:inline">Ver repositorio</span>
+            <span className="sm:hidden">Repo</span>
+            <RiGithubFill className="h-4 w-4 transition-transform group-hover:scale-110" />
+          </a>
         </div>
 
-        {/* Main Title */}
+        {/* Main Title (Reducido) */}
         <motion.div 
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, ease: "easeOut" }}
-          className="relative z-10 mx-auto mt-6 flex w-full max-w-5xl flex-col justify-center px-4 text-center sm:mt-10 sm:px-6"
+          className="relative z-10 mx-auto flex w-full max-w-4xl flex-col justify-center px-4 text-center sm:px-6"
         >
-          <h1 className="font-heading text-5xl font-bold tracking-tight text-white sm:text-7xl lg:text-8xl">
-            Descubre Euskadi <br className="hidden sm:block" />
+          <h1 className="font-heading text-4xl font-bold tracking-tight text-white sm:text-6xl lg:text-7xl">
+            Euskadi <br className="hidden sm:block" />
             <span className="bg-gradient-to-r from-orange-400 to-amber-300 bg-clip-text text-transparent">
               a tu propio ritmo.
             </span>
           </h1>
-          <p className="mx-auto mt-6 max-w-2xl text-base leading-relaxed text-zinc-300 sm:text-lg lg:text-xl">
-            Genera itinerarios vivos, visuales y adaptados a tus gustos. Planificación turística inteligente lista para repetirse cuantas veces quieras.
+          <p className="mx-auto mt-4 max-w-xl text-sm leading-relaxed text-zinc-300 sm:text-base">
+            Planificación turística a medida • Genera itinerarios inteligentes
           </p>
-          
-          <div className="mt-8 flex justify-center sm:mt-10">
-            <button 
-              onClick={scrollToMap}
-              className="group flex h-14 w-14 items-center justify-center rounded-full border border-white/10 bg-white/5 backdrop-blur-md transition-all hover:border-orange-500/40 hover:bg-white/10"
-            >
-              <RiArrowDownSLine className="h-6 w-6 text-orange-400 transition-transform group-hover:translate-y-1" />
-            </button>
-          </div>
         </motion.div>
 
-        {/* Arch Cards con Vídeos */}
+        {/* Arch Cards con Vídeos (Acordeón draggeable en móvil) */}
         <motion.div 
           initial={{ opacity: 0, y: 40 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, delay: 0.2, ease: "easeOut" }}
-          className="relative z-10 mt-12 w-full sm:mt-16"
+          className="relative z-10 w-full shrink-0 pb-6 sm:pb-10"
         >
-          <div className="mx-auto flex max-w-6xl flex-wrap justify-center gap-6 px-4 sm:gap-8 lg:px-8">
+          {/* Contenedor tipo scroll-snap para móviles, centrado en desktop */}
+          <div className="flex w-full snap-x snap-mandatory gap-4 overflow-x-auto pt-4 px-6 pb-4 sm:justify-center sm:gap-6 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
             {heroCards.map((card) => (
               <WindowVideoCard key={card.title} {...card} />
             ))}
@@ -582,9 +617,16 @@ function App() {
             className="rounded-[2rem] border border-white/5 bg-white/[0.02] p-6 shadow-2xl backdrop-blur-xl sm:p-8"
           >
             <div className="flex items-center justify-between gap-3">
-              <div>
-                <p className="text-xs font-semibold uppercase tracking-[0.3em] text-orange-400">Planificador</p>
-                <h2 className="mt-2 text-2xl font-semibold text-white">Ajusta tu viaje</h2>
+              <div className="flex items-center gap-3">
+                <div>
+                  <p className="text-xs font-semibold uppercase tracking-[0.3em] text-orange-400">Planificador</p>
+                  <h2 className="mt-2 text-2xl font-semibold text-white">Ajusta tu viaje</h2>
+                </div>
+                {/* Health tag reubicado aquí de manera sutil */}
+                <span className="hidden items-center gap-1.5 rounded-full border border-orange-500/20 bg-orange-500/10 px-2 py-0.5 text-[10px] font-medium text-orange-300 sm:inline-flex mt-6">
+                  <RiVerifiedBadgeFill className="h-3 w-3" />
+                  {health.label}
+                </span>
               </div>
               <span className="rounded-full border border-orange-500/20 bg-orange-500/10 px-4 py-1.5 text-xs font-medium text-orange-300">
                 {tripDurationDays} días
@@ -592,116 +634,84 @@ function App() {
             </div>
 
             <div className="mt-8 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
-              <label className="grid gap-2">
-                <span className="text-sm font-medium text-zinc-300">Fecha desde</span>
-                <input
-                  type="date"
-                  value={form.startDate}
-                  min={defaultStartDate}
-                  max={maxDate}
-                  onChange={(event) => updateField('startDate', event.target.value)}
-                  className="rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-zinc-100 outline-none transition focus:border-orange-500/50 focus:bg-white/10"
+              {/* El DatePicker ocupa 2 columnas para que quepan bien los dos meses visualmente */}
+              <div className="sm:col-span-2">
+                <CustomDatePicker
+                  label="Rango de fechas"
+                  value={form.dateRange}
+                  minDate={defaultStartDate}
+                  maxDate={maxDate}
+                  onChange={(val) => updateField('dateRange', val)}
+                  disabled={false}
+                  isNext={activeStep === 0}
                 />
-              </label>
+              </div>
 
-              <label className="grid gap-2">
-                <span className="text-sm font-medium text-zinc-300">Fecha hasta</span>
-                <input
-                  type="date"
-                  value={form.endDate}
-                  min={form.startDate || defaultStartDate}
-                  max={maxDate}
-                  onChange={(event) => updateField('endDate', event.target.value)}
-                  className="rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-zinc-100 outline-none transition focus:border-orange-500/50 focus:bg-white/10"
-                />
-              </label>
+              <CustomSelect
+                label="Preferencia"
+                value={form.preference}
+                onChange={(val) => updateField('preference', val)}
+                options={preferenceOptions}
+                disabled={activeStep < 1}
+                isNext={activeStep === 1}
+              />
 
-              <label className="grid gap-2">
-                <span className="text-sm font-medium text-zinc-300">Preferencia</span>
-                <select
-                  value={form.preference}
-                  onChange={(event) => updateField('preference', event.target.value)}
-                  className="rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-zinc-100 outline-none transition focus:border-orange-500/50 focus:bg-white/10"
-                >
-                  {preferenceOptions.map((option) => (
-                    <option key={option.value} value={option.value} className="bg-zinc-900">
-                      {option.label}
-                    </option>
-                  ))}
-                </select>
-              </label>
+              <CustomSelect
+                label="Transporte"
+                value={form.transport}
+                onChange={(val) => updateField('transport', val)}
+                options={transportOptions}
+                disabled={activeStep < 2}
+                isNext={activeStep === 2}
+              />
 
-              <label className="grid gap-2">
-                <span className="text-sm font-medium text-zinc-300">Transporte</span>
-                <select
-                  value={form.transport}
-                  onChange={(event) => updateField('transport', event.target.value)}
-                  className="rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-zinc-100 outline-none transition focus:border-orange-500/50 focus:bg-white/10"
-                >
-                  {transportOptions.map((option) => (
-                    <option key={option.value} value={option.value} className="bg-zinc-900">
-                      {option.label}
-                    </option>
-                  ))}
-                </select>
-              </label>
+              <CustomSelect
+                label="Ritmo"
+                value={form.pace}
+                onChange={(val) => updateField('pace', val)}
+                options={paceOptions}
+                disabled={activeStep < 3}
+                isNext={activeStep === 3}
+              />
 
-              <label className="grid gap-2">
-                <span className="text-sm font-medium text-zinc-300">Ritmo</span>
-                <select
-                  value={form.pace}
-                  onChange={(event) => updateField('pace', event.target.value)}
-                  className="rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-zinc-100 outline-none transition focus:border-orange-500/50 focus:bg-white/10"
-                >
-                  {paceOptions.map((option) => (
-                    <option key={option.value} value={option.value} className="bg-zinc-900">
-                      {option.label}
-                    </option>
-                  ))}
-                </select>
-              </label>
+              <CustomSelect
+                label="Presupuesto"
+                value={form.budget}
+                onChange={(val) => updateField('budget', val)}
+                options={[
+                  { value: 'bajo', label: 'Bajo' },
+                  { value: 'medio', label: 'Medio' },
+                  { value: 'alto', label: 'Alto' }
+                ]}
+                disabled={activeStep < 4}
+                isNext={activeStep === 4}
+              />
 
-              <label className="grid gap-2">
-                <span className="text-sm font-medium text-zinc-300">Presupuesto</span>
-                <select
-                  value={form.budget}
-                  onChange={(event) => updateField('budget', event.target.value)}
-                  className="rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-zinc-100 outline-none transition focus:border-orange-500/50 focus:bg-white/10"
-                >
-                  {['bajo', 'medio', 'alto'].map((option) => (
-                    <option key={option} value={option} className="bg-zinc-900 capitalize">
-                      {option}
-                    </option>
-                  ))}
-                </select>
-              </label>
+              <CustomSelect
+                label="Personas"
+                value={form.partySize}
+                onChange={(val) => updateField('partySize', val)}
+                options={Array.from({ length: 12 }, (_, i) => ({
+                  value: i + 1,
+                  label: `${i + 1} ${i === 0 ? 'persona' : 'personas'}`
+                }))}
+                disabled={activeStep < 5}
+                isNext={activeStep === 5}
+              />
 
-              <label className="grid gap-2">
-                <span className="text-sm font-medium text-zinc-300">Personas</span>
-                <input
-                  type="number"
-                  min="1"
-                  max="12"
-                  value={form.partySize}
-                  onChange={(event) => updateField('partySize', Number(event.target.value) || 1)}
-                  className="rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-zinc-100 outline-none transition focus:border-orange-500/50 focus:bg-white/10"
-                />
-              </label>
-
-              <label className="grid gap-2">
-                <span className="text-sm font-medium text-zinc-300">Accesibilidad</span>
-                <select
-                  value={form.accessibility}
-                  onChange={(event) => updateField('accessibility', event.target.value)}
-                  className="rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-zinc-100 outline-none transition focus:border-orange-500/50 focus:bg-white/10"
-                >
-                  {['normal', 'step-free', 'low-walk', 'high-comfort'].map((option) => (
-                    <option key={option} value={option} className="bg-zinc-900">
-                      {option}
-                    </option>
-                  ))}
-                </select>
-              </label>
+              <CustomSelect
+                label="Accesibilidad"
+                value={form.accessibility}
+                onChange={(val) => updateField('accessibility', val)}
+                options={[
+                  { value: 'normal', label: 'Normal' },
+                  { value: 'step-free', label: 'Sin escalones' },
+                  { value: 'low-walk', label: 'Poco caminar' },
+                  { value: 'high-comfort', label: 'Alto confort' }
+                ]}
+                disabled={activeStep < 6}
+                isNext={activeStep === 6}
+              />
             </div>
 
             <div className="mt-8 rounded-[1.75rem] border border-white/5 bg-white/[0.02] p-5 sm:p-6">
@@ -745,23 +755,10 @@ function App() {
               </div>
             </div>
 
-            <div className="mt-6 grid gap-2">
-              <label className="grid gap-2">
-                <span className="text-sm font-medium text-zinc-300">Instrucciones o contexto adicional (Opcional)</span>
-                <textarea
-                  value={form.notes}
-                  onChange={(event) => updateField('notes', event.target.value)}
-                  rows={3}
-                  placeholder="Ej: Viaje de aniversario, buscamos probar sidrerías, preferimos evitar madrugar."
-                  className="resize-none rounded-2xl border border-white/10 bg-white/5 px-4 py-4 text-zinc-100 outline-none transition placeholder:text-zinc-600 focus:border-orange-500/50 focus:bg-white/10"
-                />
-              </label>
-            </div>
-
             <div className="mt-8 flex flex-wrap items-center gap-4 border-t border-white/5 pt-8">
               <button
                 type="submit"
-                disabled={status === 'loading'}
+                disabled={status === 'loading' || activeStep < formSequence.length}
                 className="group inline-flex items-center gap-3 rounded-full bg-orange-500 px-7 py-3.5 text-sm font-bold text-zinc-950 transition hover:bg-orange-400 hover:shadow-[0_0_20px_rgba(249,115,22,0.3)] disabled:cursor-wait disabled:opacity-70"
               >
                 {status === 'loading' ? (
