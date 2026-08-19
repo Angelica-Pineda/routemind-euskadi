@@ -1,0 +1,28 @@
+{
+	"name": "ds_http_xml_flatfiles",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "LS_HTTP_OpenDataEuskadi",
+			"type": "LinkedServiceReference"
+		},
+		"parameters": {
+			"url_data": {
+				"type": "string"
+			}
+		},
+		"folder": {
+			"name": "Source"
+		},
+		"annotations": [],
+		"type": "Xml",
+		"typeProperties": {
+			"location": {
+				"type": "HttpServerLocation",
+				"relativeUrl": {
+					"value": "@dataset().url_data",
+					"type": "Expression"
+				}
+			}
+		}
+	}
+}
