@@ -133,3 +133,8 @@
   visibility: visible !important;
   transform: none !important;
 }
+
+html, body {
+  overflow-y: auto !important;
+  padding-right: 0 !important; /* Evita saltos por la barra de scroll */
+}

@@ -1,25 +1,41 @@
-import { Fragment } from 'react'
+import { Fragment, useEffect, useRef } from 'react'
 import { Listbox, Transition } from '@headlessui/react'
 import { RiArrowDownSLine, RiCheckLine } from 'react-icons/ri'
 
 export function CustomSelect({ value, onChange, options, label, disabled, isNext }) {
+  const buttonRef = useRef(null)
   const selectedOption = options.find((opt) => opt.value === value) || { label: 'Selecciona una opción...' }
+
+  // Auto-abrir sin forzar el salto de scroll
+  useEffect(() => {
+    if (isNext && !disabled) {
+      const timer = setTimeout(() => {
+        // Evitamos hacer click si ya está abierto
+        const isExpanded = buttonRef.current?.getAttribute('aria-expanded') === 'true'
+        if (!isExpanded) {
+          buttonRef.current?.focus({ preventScroll: true })
+          buttonRef.current?.click()
+        }
+      }, 350) // Ligero retraso para que el usuario note la transición
+      return () => clearTimeout(timer)
+    }
+  }, [isNext, disabled])
 
   return (
     <div className={`grid gap-2 transition-all duration-500 ${disabled ? 'pointer-events-none opacity-40 grayscale' : 'opacity-100'}`}>
       <span className="text-sm font-medium text-zinc-300">{label}</span>
       
-      {/* modal={false} desactiva la detención del scroll introducida en Headless UI v2 */}
       <Listbox value={value} onChange={onChange} disabled={disabled}>
         <div className="relative mt-1">
           <Listbox.Button 
+            ref={buttonRef}
             className={`relative w-full cursor-pointer rounded-2xl border px-4 py-3 text-left text-zinc-100 shadow-sm transition-all duration-300 focus:outline-none ${isNext ? 'border-orange-500/80 bg-orange-500/10 shadow-[0_0_15px_rgba(249,115,22,0.2)] ring-1 ring-orange-500/50' : 'border-white/10 bg-white/5 hover:border-orange-500/40 hover:bg-white/10'}`}
           >
             <span className={`block truncate capitalize ${!value ? 'text-zinc-500' : ''}`}>
               {selectedOption.label || selectedOption.value}
             </span>
             <span className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-4">
-              <RiArrowDownSLine className={`h-5 w-5 transition-transform ${isNext ? 'text-orange-300' : 'text-orange-400'}`} aria-hidden="true" />
+              <RiArrowDownSLine className={`h-5 w-5 transition-transform ${isNext ? 'text-orange-300 animate-pulse' : 'text-orange-400'}`} aria-hidden="true" />
             </span>
           </Listbox.Button>
           

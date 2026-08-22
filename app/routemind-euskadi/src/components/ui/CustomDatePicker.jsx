@@ -9,7 +9,8 @@ export function CustomDatePicker({ value, onChange, label, minDate, maxDate, dis
     <div className={`grid gap-2 transition-all duration-500 relative z-50 ${disabled ? 'pointer-events-none opacity-40 grayscale' : 'opacity-100'}`}>
       <span className="text-sm font-medium text-zinc-300">{label}</span>
       <div className={`relative rounded-2xl transition-all duration-300 ${isNext ? 'shadow-[0_0_20px_rgba(249,115,22,0.15)] ring-1 ring-orange-500/50' : ''}`}>
-        <Datepicker 
+        <Datepicker
+          primaryColor={"orange"}
           asSingle={false} 
           useRange={true}
           value={safeValue} 

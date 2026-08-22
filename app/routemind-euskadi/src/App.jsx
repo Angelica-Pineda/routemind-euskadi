@@ -14,7 +14,8 @@ import {
   RiMailSendLine, 
   RiMagicLine, 
   RiLinkedinFill,
-  RiGithubFill
+  RiGithubFill,
+  RiCalendarCheckLine
 } from 'react-icons/ri'
 import { paceOptions, preferenceOptions, siteOptions, transportOptions, zoneOptions } from '../shared/catalog.js'
 import { MapContainer, Marker, Popup, TileLayer } from 'react-leaflet'
@@ -182,8 +183,8 @@ function MapZonePreview({ selectedZone, onSelectZone }) {
     <div className="overflow-hidden rounded-[2rem] border border-white/10 bg-zinc-950/70 shadow-[0_24px_100px_rgba(9,9,11,0.5)] backdrop-blur-md">
       <div className="flex flex-wrap items-center justify-between gap-3 border-b border-white/10 px-5 py-4">
         <div>
-          <p className="text-xs uppercase tracking-[0.3em] text-orange-400/80">Mapa real</p>
-          <h3 className="mt-2 text-xl font-semibold text-white">Selecciona la zona con el mapa o con la lista</h3>
+          <p className="text-xs uppercase tracking-[0.3em] text-orange-400/80">Mapa de zonas</p>
+          <h3 className="mt-2 text-xl font-semibold text-white">Selecciona la zona en el mapa o en la lista</h3>
         </div>
         <div className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-3 py-1.5 text-xs text-zinc-300">
           <RiFocus3Line className="h-3.5 w-3.5 text-orange-400" />
@@ -210,17 +211,7 @@ function MapZonePreview({ selectedZone, onSelectZone }) {
         </div>
 
         <aside className="map-preview-sidebar border-t border-white/10 bg-zinc-950/92 p-4 backdrop-blur-xl lg:sticky lg:top-4 lg:self-start lg:rounded-[1.6rem] lg:border lg:border-white/10 lg:p-5">
-          <div className="flex items-center justify-between gap-3">
-            <div>
-              <p className="text-xs uppercase tracking-[0.3em] text-orange-400/80">Zonas</p>
-              <h4 className="mt-2 text-lg font-semibold text-white">Explora sin salir</h4>
-            </div>
-            <span className="rounded-full border border-white/10 bg-white/5 px-2.5 py-1 text-[11px] text-zinc-300">
-              {zoneOptions.length} opciones
-            </span>
-          </div>
-
-          <div className="mt-4 grid max-h-[26rem] gap-3 overflow-y-auto lg:max-h-[32rem] [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
+          <div className="grid max-h-[26rem] gap-3 overflow-y-auto lg:max-h-[36rem] [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
             {zoneOptions.map((zone) => (
               <button
                 key={zone.id}
@@ -542,7 +533,6 @@ function App() {
           </a>
         </div>
 
-        {/* Main Title (Reducido) */}
         <motion.div 
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
@@ -552,7 +542,7 @@ function App() {
           <h1 className="font-heading text-4xl font-bold tracking-tight text-white sm:text-6xl lg:text-7xl">
             Euskadi <br className="hidden sm:block" />
             <span className="bg-gradient-to-r from-orange-400 to-amber-300 bg-clip-text text-transparent">
-              a tu propio ritmo.
+              a tu propio ritmo
             </span>
           </h1>
           <p className="mx-auto mt-4 max-w-xl text-sm leading-relaxed text-zinc-300 sm:text-base">
@@ -576,13 +566,58 @@ function App() {
         </motion.div>
       </header>
 
-      {/* MAIN */}
       <main id="mapa-zonas" className="relative z-10 mx-auto flex w-full max-w-7xl flex-col gap-10 px-4 py-16 sm:px-6 lg:gap-14 lg:px-8 lg:py-24">
+        <motion.section
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, margin: "-100px" }}
+          transition={{ duration: 0.7, ease: 'easeOut' }}
+          className="mx-auto w-full max-w-6xl"
+        >
+          <div className="text-center">
+            <h2 className="text-xs font-semibold uppercase tracking-[0.3em] text-orange-400">Cómo funciona</h2>
+            <h3 className="mt-2 font-heading text-3xl font-semibold tracking-tight text-white sm:text-4xl">
+              Tu viaje inteligente en tres pasos
+            </h3>
+          </div>
+          
+          <div className="mt-12 grid gap-6 md:grid-cols-3">
+            <div className="group relative overflow-hidden rounded-[2rem] border border-white/5 bg-white/[0.02] p-8 shadow-2xl backdrop-blur-sm transition-all hover:border-orange-500/30 hover:bg-white/[0.04]">
+              <div className="mb-6 flex h-14 w-14 items-center justify-center rounded-2xl bg-orange-500/10 text-orange-400 transition-transform group-hover:scale-110">
+                <RiMapPin2Line className="h-7 w-7" />
+              </div>
+              <h4 className="text-xl font-bold text-white">1. Elige tu zona</h4>
+              <p className="mt-4 text-sm leading-relaxed text-zinc-400">
+                Explora el mapa y selecciona tu base territorial. Euskadi tiene rincones únicos esperando por ti.
+              </p>
+            </div>
+
+            <div className="group relative overflow-hidden rounded-[2rem] border border-white/5 bg-white/[0.02] p-8 shadow-2xl backdrop-blur-sm transition-all hover:border-orange-500/30 hover:bg-white/[0.04]">
+              <div className="mb-6 flex h-14 w-14 items-center justify-center rounded-2xl bg-orange-500/10 text-orange-400 transition-transform group-hover:scale-110">
+                <RiCalendarCheckLine className="h-7 w-7" />
+              </div>
+              <h4 className="text-xl font-bold text-white">2. Contexto exacto</h4>
+              <p className="mt-4 text-sm leading-relaxed text-zinc-400">
+                Define tus fechas y preferencias. El sistema evaluará eventos culturales, monumentos y sitios clave de la zona.
+              </p>
+            </div>
+
+            <div className="group relative overflow-hidden rounded-[2rem] border border-white/5 bg-white/[0.02] p-8 shadow-2xl backdrop-blur-sm transition-all hover:border-orange-500/30 hover:bg-white/[0.04]">
+              <div className="mb-6 flex h-14 w-14 items-center justify-center rounded-2xl bg-orange-500/10 text-orange-400 transition-transform group-hover:scale-110">
+                <RiMagicLine className="h-7 w-7" />
+              </div>
+              <h4 className="text-xl font-bold text-white">3. Explora tu itinerario</h4>
+              <p className="mt-4 text-sm leading-relaxed text-zinc-400">
+                Obten un itinerario lógico y armónico, equilibrando los sitios imprescindibles con los mejores eventos.
+              </p>
+            </div>
+          </div>
+        </motion.section>
         
         <section className="space-y-8">
           <MapZonePreview selectedZone={selectedZone} onSelectZone={handleZoneSelect} />
 
-          <motion.section
+          {/* <motion.section
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true, margin: "-100px" }}
@@ -606,7 +641,7 @@ function App() {
                 </span>
               ))}
             </div>
-          </motion.section>
+          </motion.section> */}
 
           <motion.form
             initial={{ opacity: 0, y: 20 }}
@@ -714,12 +749,11 @@ function App() {
               />
             </div>
 
-            <div className="mt-8 rounded-[1.75rem] border border-white/5 bg-white/[0.02] p-5 sm:p-6">
+            <div className="mt-8 border-t border-white/10 pt-8">
               <div className="flex flex-wrap items-start justify-between gap-3">
                 <div>
                   <p className="text-xs font-semibold uppercase tracking-[0.3em] text-orange-400">Sitios clave</p>
-                  <h3 className="mt-2 text-xl font-semibold text-white">Guía la inteligencia artificial</h3>
-                  <p className="mt-2 max-w-2xl text-sm leading-6 text-zinc-400">
+                  <p className="mt-2 max-w-3xl text-sm leading-6 text-white">
                     Marca hasta tres lugares imprescindibles para ti. De esta manera Gemini estructurará un viaje armónico a su alrededor.
                   </p>
                 </div>
@@ -755,7 +789,7 @@ function App() {
               </div>
             </div>
 
-            <div className="mt-8 flex flex-wrap items-center gap-4 border-t border-white/5 pt-8">
+            <div className="mt-8 flex flex-wrap items-center gap-4 border-t border-white/10 pt-8">
               <button
                 type="submit"
                 disabled={status === 'loading' || activeStep < formSequence.length}
@@ -773,10 +807,6 @@ function App() {
                   </>
                 )}
               </button>
-
-              <span className="text-sm text-zinc-500">
-                Modifica y regenera sin límite.
-              </span>
             </div>
 
             <AnimatePresence mode="wait">
