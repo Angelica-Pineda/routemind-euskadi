@@ -14,8 +14,7 @@ import {
   RiMailSendLine, 
   RiMagicLine, 
   RiLinkedinFill,
-  RiGithubFill,
-  RiCalendarCheckLine
+  RiGithubFill
 } from 'react-icons/ri'
 import { paceOptions, preferenceOptions, siteOptions, transportOptions, zoneOptions } from '../shared/catalog.js'
 import { MapContainer, Marker, Popup, TileLayer } from 'react-leaflet'
@@ -490,8 +489,6 @@ function App() {
 
   return (
     <div className="relative min-h-screen bg-zinc-950 font-sans text-zinc-100 selection:bg-orange-500/30 selection:text-orange-100">
-      
-      {/* HEADER HERO (Ocupa exactamente el alto de la pantalla) */}
       <header className="relative flex h-[100dvh] w-full flex-col justify-between overflow-hidden">
         
         {/* Fondo Ikurriña */}
@@ -516,7 +513,6 @@ function App() {
             </span>
           </div>
           
-          {/* Tag Github Link (Creativo y con pulso) */}
           <a
             href="https://github.com/Angelica-Pineda/routemind-euskadi"
             target="_blank"
@@ -566,54 +562,65 @@ function App() {
         </motion.div>
       </header>
 
-      <main id="mapa-zonas" className="relative z-10 mx-auto flex w-full max-w-7xl flex-col gap-10 px-4 py-16 sm:px-6 lg:gap-14 lg:px-8 lg:py-24">
-        <motion.section
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, margin: "-100px" }}
-          transition={{ duration: 0.7, ease: 'easeOut' }}
-          className="mx-auto w-full max-w-6xl"
-        >
-          <div className="text-center">
-            <h2 className="text-xs font-semibold uppercase tracking-[0.3em] text-orange-400">Cómo funciona</h2>
-            <h3 className="mt-2 font-heading text-3xl font-semibold tracking-tight text-white sm:text-4xl">
-              Tu viaje inteligente en tres pasos
-            </h3>
-          </div>
-          
-          <div className="mt-12 grid gap-6 md:grid-cols-3">
-            <div className="group relative overflow-hidden rounded-[2rem] border border-white/5 bg-white/[0.02] p-8 shadow-2xl backdrop-blur-sm transition-all hover:border-orange-500/30 hover:bg-white/[0.04]">
-              <div className="mb-6 flex h-14 w-14 items-center justify-center rounded-2xl bg-orange-500/10 text-orange-400 transition-transform group-hover:scale-110">
-                <RiMapPin2Line className="h-7 w-7" />
-              </div>
-              <h4 className="text-xl font-bold text-white">1. Elige tu zona</h4>
-              <p className="mt-4 text-sm leading-relaxed text-zinc-400">
-                Explora el mapa y selecciona tu base territorial. Euskadi tiene rincones únicos esperando por ti.
-              </p>
-            </div>
+      <motion.section
+        initial={{ opacity: 0, y: 20 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true, margin: "-100px" }}
+        transition={{ duration: 0.7, ease: 'easeOut' }}
+        className="relative mx-auto w-full pt-8"
+      >
+        {/* Contenedor de Imagen de Fondo (Constrained Height) */}
+        <div className="relative mx-auto h-[450px] w-full max-w-100% overflow-hidden sm:h-[500px]">
+          <img 
+            src="/bilbao3.jpg" 
+            alt="Fondo Bilbao" 
+            className="absolute inset-0 h-full w-full object-cover" 
+          />
+          {/* Capas de degradado para oscurecer y fusionar con el fondo global */}
+          <div className="absolute inset-0 bg-gradient-to-r from-zinc-950/40 via-zinc-950/10 to-transparent" />
+          <div className="absolute inset-0 bg-gradient-to-t from-zinc-950 via-transparent to-transparent opacity-80" />
+          <div className="absolute inset-0 bg-zinc-900/30 mix-blend-multiply" />
 
-            <div className="group relative overflow-hidden rounded-[2rem] border border-white/5 bg-white/[0.02] p-8 shadow-2xl backdrop-blur-sm transition-all hover:border-orange-500/30 hover:bg-white/[0.04]">
-              <div className="mb-6 flex h-14 w-14 items-center justify-center rounded-2xl bg-orange-500/10 text-orange-400 transition-transform group-hover:scale-110">
-                <RiCalendarCheckLine className="h-7 w-7" />
-              </div>
-              <h4 className="text-xl font-bold text-white">2. Contexto exacto</h4>
-              <p className="mt-4 text-sm leading-relaxed text-zinc-400">
-                Define tus fechas y preferencias. El sistema evaluará eventos culturales, monumentos y sitios clave de la zona.
-              </p>
-            </div>
-
-            <div className="group relative overflow-hidden rounded-[2rem] border border-white/5 bg-white/[0.02] p-8 shadow-2xl backdrop-blur-sm transition-all hover:border-orange-500/30 hover:bg-white/[0.04]">
-              <div className="mb-6 flex h-14 w-14 items-center justify-center rounded-2xl bg-orange-500/10 text-orange-400 transition-transform group-hover:scale-110">
-                <RiMagicLine className="h-7 w-7" />
-              </div>
-              <h4 className="text-xl font-bold text-white">3. Explora tu itinerario</h4>
-              <p className="mt-4 text-sm leading-relaxed text-zinc-400">
-                Obten un itinerario lógico y armónico, equilibrando los sitios imprescindibles con los mejores eventos.
-              </p>
-            </div>
+          {/* Textos sobre la imagen */}
+          <div className="relative z-10 flex h-full flex-col items-end p-8 pt-12 sm:p-16">
+            <p className="text-xs font-bold uppercase tracking-[0.3em] text-white">Cómo funciona</p>
+            <h2 className="mt-4 font-heading text-4xl font-bold tracking-tight text-right text-white sm:text-5xl lg:text-6xl">
+              Diseña tu ruta <br />
+              <span className="bg-gradient-to-r from-orange-400 to-amber-300 bg-clip-text text-transparent">en 3 pasos</span>
+            </h2>
           </div>
-        </motion.section>
-        
+        </div>
+
+        {/* Tarjetas Superpuestas (Overlapping con margen negativo) */}
+        <div className="relative z-20 mx-auto -mt-32 grid max-w-7xl gap-6 px-4 sm:-mt-40 md:grid-cols-3 sm:px-8">          
+          <div className="group rounded-[2rem] border border-white/5 bg-zinc-900/95 p-8 shadow-[0_24px_50px_rgba(0,0,0,0.5)] backdrop-blur-xl transition-all hover:border-orange-500/50 hover:shadow-[0_24px_50px_rgba(249,115,22,0.15)]">
+            <div className="text-5xl font-bold text-blue-400/50 transition-colors group-hover:text-blue-400">01.</div>
+            <h4 className="mt-4 text-xl font-bold text-white">Elige tu zona</h4>
+            <p className="mt-4 text-sm leading-relaxed text-zinc-400">
+              Explora el mapa y selecciona tu base territorial. Euskadi tiene rincones únicos esperando por ti.
+            </p>
+          </div>
+
+          <div className="group rounded-[2rem] border border-white/5 bg-zinc-900/95 p-8 shadow-[0_24px_50px_rgba(0,0,0,0.5)] backdrop-blur-xl transition-all hover:border-orange-500/50 hover:shadow-[0_24px_50px_rgba(249,115,22,0.15)]">
+            <div className="text-5xl font-bold text-blue-400/50 transition-colors group-hover:text-blue-400">02.</div>
+            <h4 className="mt-4 text-xl font-bold text-white">Contexto exacto</h4>
+            <p className="mt-4 text-sm leading-relaxed text-zinc-400">
+              Define tus fechas y preferencias. El sistema evaluará eventos culturales, monumentos y sitios clave de la zona.
+            </p>
+          </div>
+
+          <div className="group rounded-[2rem] border border-white/5 bg-zinc-900/95 p-8 shadow-[0_24px_50px_rgba(0,0,0,0.5)] backdrop-blur-xl transition-all hover:border-orange-500/50 hover:shadow-[0_24px_50px_rgba(249,115,22,0.15)]">
+            <div className="text-5xl font-bold text-blue-400/50 transition-colors group-hover:text-blue-400">03.</div>
+            <h4 className="mt-4 text-xl font-bold text-white">Itinerario vivo</h4>
+            <p className="mt-4 text-sm leading-relaxed text-zinc-400">
+              Obtén un itinerario lógico y armónico, equilibrando los sitios imprescindibles con los mejores eventos locales.
+            </p>
+          </div>
+
+        </div>
+      </motion.section>
+
+      <main id="mapa-zonas" className="relative z-10 mx-auto flex w-full max-w-7xl flex-col gap-10 px-4 py-16 sm:px-6 lg:gap-14 lg:px-8 lg:py-24">       
         <section className="space-y-8">
           <MapZonePreview selectedZone={selectedZone} onSelectZone={handleZoneSelect} />
 
