@@ -259,11 +259,11 @@ function Footer() {
               <EuskadiFlag />
               <span className="text-zinc-100">RouteMind Euskadi</span>
             </div>
-            <h2 className="mt-6 font-heading text-2xl font-semibold tracking-tight text-white sm:text-3xl">
+            <h2 className="mt-6 font-heading text-2xl font-semibold tracking-tight text-white/90 sm:text-3xl">
               Hecho por Angélica Pineda
             </h2>
             <p className="mt-4 max-w-xl text-sm leading-7 text-zinc-300 sm:text-[15px]">
-              Una plataforma abierta para convertir la planificación de turismo en Euskadi en una experiencia más clara, inspiradora y humana: descubrir, combinar y generar rutas con criterio.
+              Una plataforma Open Source para convertir la planificación de turismo en el Pais Vasco en una experiencia más clara y sostenible. Descubre, combina y crea tus itinerarios.
             </p>
           </div>
 
@@ -310,7 +310,7 @@ function Footer() {
             </div>
 
             <div>
-              <p className="text-xs uppercase tracking-[0.28em] text-zinc-400">Open source</p>
+              <p className="text-xs uppercase tracking-[0.28em] text-zinc-400">Repo del proyecto</p>
               <a
                 href="https://github.com/Angelica-Pineda/routemind-euskadi"
                 target="_blank"
@@ -318,11 +318,11 @@ function Footer() {
                 className="footer-link group mt-4 flex items-center gap-3 text-sm text-zinc-300 transition hover:text-white"
               >
                 <span className="footer-link-icon text-orange-400"><RiRouteLine className="h-5 w-5" /></span>
-                <span className="border-b border-transparent pb-0.5 transition group-hover:border-orange-500/50">Repositorio del proyecto</span>
+                <span className="border-b border-transparent pb-0.5 transition group-hover:border-orange-500/50">Ver código</span>
                 <RiExternalLinkLine className="h-3.5 w-3.5 text-zinc-500 transition group-hover:text-orange-400" />
               </a>
               <p className="mt-3 text-xs leading-6 text-zinc-400">
-                Código, estructura y evolución completa del proyecto.
+                Aquí puedes ver todos los detalles técnicos, el Código y la estructura completa del proyecto. 
               </p>
             </div>
           </div>
@@ -577,16 +577,16 @@ function App() {
             className="absolute inset-0 h-full w-full object-cover" 
           />
           {/* Capas de degradado para oscurecer y fusionar con el fondo global */}
-          <div className="absolute inset-0 bg-gradient-to-r from-zinc-950/40 via-zinc-950/10 to-transparent" />
-          <div className="absolute inset-0 bg-gradient-to-t from-zinc-950 via-transparent to-transparent opacity-80" />
-          <div className="absolute inset-0 bg-zinc-900/30 mix-blend-multiply" />
+          <div className="absolute inset-0 bg-linear-to-l from-zinc-950/50 via-transparent to-transparent" />
+          <div className="absolute inset-0 bg-linear-to-t from-zinc-950/20 via-transparent to-transparent" />
+          <div className="absolute inset-0 bg-zinc-900/10 mix-blend-multiply" />
 
           {/* Textos sobre la imagen */}
           <div className="relative z-10 flex h-full flex-col items-end p-8 pt-12 sm:p-16">
             <p className="text-xs font-bold uppercase tracking-[0.3em] text-white">Cómo funciona</p>
             <h2 className="mt-4 font-heading text-4xl font-bold tracking-tight text-right text-white sm:text-5xl lg:text-6xl">
               Diseña tu ruta <br />
-              <span className="bg-gradient-to-r from-orange-400 to-amber-300 bg-clip-text text-transparent">en 3 pasos</span>
+              <span className="bg-linear-to-r from-orange-400 to-amber-300 bg-clip-text text-transparent">en 3 pasos</span>
             </h2>
           </div>
         </div>
