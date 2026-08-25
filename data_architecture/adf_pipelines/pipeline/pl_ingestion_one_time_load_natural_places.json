@@ -16,13 +16,15 @@
 				"userProperties": [],
 				"typeProperties": {
 					"source": {
-						"type": "JsonSource",
+						"type": "XmlSource",
 						"storeSettings": {
 							"type": "HttpReadSettings",
 							"requestMethod": "GET"
 						},
 						"formatSettings": {
-							"type": "JsonReadSettings"
+							"type": "XmlReadSettings",
+							"validationMode": "none",
+							"namespaces": true
 						}
 					},
 					"sink": {
@@ -38,10 +40,10 @@
 				},
 				"inputs": [
 					{
-						"referenceName": "ds_http_flatfiles",
+						"referenceName": "ds_http_xml_flatfiles",
 						"type": "DatasetReference",
 						"parameters": {
-							"url_data": "/contenidos/ds_recursos_turisticos/espacios_naturales_euskadi/opendata/espacios-naturales.json"
+							"url_data": "/contenidos/ds_recursos_turisticos/espacios_naturales_euskadi/opendata/espacios-naturales.xml"
 						}
 					}
 				],
