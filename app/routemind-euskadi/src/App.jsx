@@ -23,6 +23,26 @@ import './App.css'
 import 'leaflet/dist/leaflet.css'
 import { CustomSelect } from './components/ui/CustomSelect'
 import { CustomDatePicker } from './components/ui/CustomDatePicker'
+import { CustomMultiSelect } from './components/ui/CustomMultiSelect'
+
+const planOptions = [
+  { value: 'playa', label: 'Playa y costa' },
+  { value: 'montana', label: 'Montañismo y naturaleza' },
+  { value: 'pueblos', label: 'Pueblos con encanto' },
+  { value: 'ciudades', label: 'Ciudades y urbanismo' },
+  { value: 'museos', label: 'Museos y arte' },
+  { value: 'monumentos', label: 'Monumentos históricos' },
+  { value: 'sidrerias', label: 'Sidrerías tradicionales' },
+  { value: 'bodegas', label: 'Bodegas y enoturismo' },
+  { value: 'gastronomia', label: 'Alta gastronomía' },
+  { value: 'festivales', label: 'Festivales de música' },
+  { value: 'conciertos', label: 'Conciertos y ocio nocturno' },
+  { value: 'deportes', label: 'Eventos deportivos' },
+  { value: 'surf', label: 'Surf y deportes acuáticos' },
+  { value: 'relax', label: 'Spas y relajación' },
+  { value: 'industrial', label: 'Turismo industrial y minero' },
+  { value: 'txakoli', label: 'Rutas y catas de Txakoli' },
+]
 
 function formatDateInput(date) {
   return date.toISOString().slice(0, 10)
@@ -53,21 +73,6 @@ const defaultStartDate = formatDateInput(new Date())
 const defaultEndDate = formatDateInput(addDays(new Date(), 2))
 const maxDate = formatDateInput(addMonths(new Date(), 3))
 
-// const initialFormState = {
-//   startDate: defaultStartDate,
-//   endDate: defaultEndDate,
-//   zone: 'bilbao-metro',
-//   preference: 'indiferente',
-//   transport: 'publico',
-//   pace: 'equilibrado',
-//   budget: 'medio',
-//   partySize: 2,
-//   accessibility: 'normal',
-//   focus: 'equilibrio',
-//   notes: '',
-//   sites: ['guggenheim-bilbao', 'casco-viejo-bilbao'],
-// }
-
 const heroCards = [
   {
     title: 'TERRITORIO A TU MEDIDA',
@@ -89,13 +94,11 @@ const heroCards = [
 const initialFormState = {
   dateRange: { startDate: null, endDate: null },
   zone: 'bilbao-metro',
-  preference: '', // Empezamos en vacío para forzar la interacción secuencial
   transport: '',
   pace: '',
   budget: '',
   partySize: '',
-  accessibility: '',
-  notes: '',
+  plans: [],
   sites: ['guggenheim-bilbao', 'casco-viejo-bilbao'],
 }
 
@@ -475,12 +478,12 @@ function App() {
 
   // Lógica para determinar qué campo debe estar activo/sugerido
   const formSequence = [
-    'dateRange', 'preference', 'transport', 'pace', 
-    'budget', 'partySize', 'accessibility'
+    'dateRange', 'transport', 'pace', 'budget', 'partySize', 'plans'
   ];
 
   const currentStepIndex = formSequence.findIndex(key => {
     if (key === 'dateRange') return !form.dateRange?.startDate || !form.dateRange?.endDate;
+    if (key === 'plans') return !form.plans || form.plans.length === 0;
     return !form[key];
   });
   
@@ -690,21 +693,12 @@ function App() {
               </div>
 
               <CustomSelect
-                label="Preferencia"
-                value={form.preference}
-                onChange={(val) => updateField('preference', val)}
-                options={preferenceOptions}
-                disabled={activeStep < 1}
-                isNext={activeStep === 1}
-              />
-
-              <CustomSelect
                 label="Transporte"
                 value={form.transport}
                 onChange={(val) => updateField('transport', val)}
                 options={transportOptions}
-                disabled={activeStep < 2}
-                isNext={activeStep === 2}
+                disabled={activeStep < 1}
+                isNext={activeStep === 1}
               />
 
               <CustomSelect
@@ -712,8 +706,8 @@ function App() {
                 value={form.pace}
                 onChange={(val) => updateField('pace', val)}
                 options={paceOptions}
-                disabled={activeStep < 3}
-                isNext={activeStep === 3}
+                disabled={activeStep < 2}
+                isNext={activeStep === 2}
               />
 
               <CustomSelect
@@ -725,8 +719,8 @@ function App() {
                   { value: 'medio', label: 'Medio' },
                   { value: 'alto', label: 'Alto' }
                 ]}
-                disabled={activeStep < 4}
-                isNext={activeStep === 4}
+                disabled={activeStep < 3}
+                isNext={activeStep === 3}
               />
 
               <CustomSelect
@@ -737,23 +731,20 @@ function App() {
                   value: i + 1,
                   label: `${i + 1} ${i === 0 ? 'persona' : 'personas'}`
                 }))}
-                disabled={activeStep < 5}
-                isNext={activeStep === 5}
+                disabled={activeStep < 4}
+                isNext={activeStep === 4}
               />
 
-              <CustomSelect
-                label="Accesibilidad"
-                value={form.accessibility}
-                onChange={(val) => updateField('accessibility', val)}
-                options={[
-                  { value: 'normal', label: 'Normal' },
-                  { value: 'step-free', label: 'Sin escalones' },
-                  { value: 'low-walk', label: 'Poco caminar' },
-                  { value: 'high-comfort', label: 'Alto confort' }
-                ]}
-                disabled={activeStep < 6}
-                isNext={activeStep === 6}
-              />
+              <div className="sm:col-span-2">
+                <CustomMultiSelect
+                  label="Preferencia de planes"
+                  value={form.plans}
+                  onChange={(val) => updateField('plans', val)}
+                  options={planOptions}
+                  disabled= {activeStep < 5}
+                  isNext={activeStep === 5}
+                />
+              </div>
             </div>
 
             <div className="mt-8 border-t border-white/10 pt-8">
