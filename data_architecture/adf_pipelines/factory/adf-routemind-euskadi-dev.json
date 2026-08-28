@@ -2,7 +2,7 @@
 	"name": "adf-routemind-euskadi-dev",
 	"properties": {
 		"globalConfigurations": {
-			"PipelineBillingEnabled": "true"
+			"PipelineBillingEnabled": "false"
 		}
 	},
 	"location": "swedencentral"
