@@ -45,7 +45,7 @@
 						"type": "DatasetReference",
 						"parameters": {
 							"path": "municipality_codes",
-							"filename": "municipality_codes.csv"
+							"filename": "municipality_codes.json"
 						}
 					}
 				]
