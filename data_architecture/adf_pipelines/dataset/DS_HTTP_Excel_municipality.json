@@ -1,0 +1,24 @@
+{
+	"name": "DS_HTTP_Excel_municipality",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "LS_HTTP_Eustat",
+			"type": "LinkedServiceReference"
+		},
+		"folder": {
+			"name": "Source"
+		},
+		"annotations": [],
+		"type": "Excel",
+		"typeProperties": {
+			"location": {
+				"type": "HttpServerLocation",
+				"relativeUrl": "documentos/datos/codigos/Euskadi.xls"
+			},
+			"sheetIndex": 0,
+			"range": "A14",
+			"firstRowAsHeader": true
+		},
+		"schema": []
+	}
+}
