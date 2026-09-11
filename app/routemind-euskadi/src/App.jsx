@@ -28,19 +28,13 @@ import { CustomMultiSelect } from './components/ui/CustomMultiSelect'
 const planOptions = [
   { value: 'playa', label: 'Playa y costa' },
   { value: 'montana', label: 'Montañismo y naturaleza' },
-  { value: 'pueblos', label: 'Pueblos con encanto' },
-  { value: 'ciudades', label: 'Ciudades y urbanismo' },
-  { value: 'museos', label: 'Museos y arte' },
-  { value: 'monumentos', label: 'Monumentos históricos' },
+  { value: 'monumentos-sitios-historicos', label: 'Monumentos y Sitios históricos' },
   { value: 'sidrerias', label: 'Sidrerías tradicionales' },
   { value: 'bodegas', label: 'Bodegas y enoturismo' },
   { value: 'gastronomia', label: 'Alta gastronomía' },
-  { value: 'festivales', label: 'Festivales de música' },
-  { value: 'conciertos', label: 'Conciertos y ocio nocturno' },
-  { value: 'deportes', label: 'Eventos deportivos' },
-  { value: 'surf', label: 'Surf y deportes acuáticos' },
-  { value: 'relax', label: 'Spas y relajación' },
-  { value: 'industrial', label: 'Turismo industrial y minero' },
+  { value: 'conciertos-festivales', label: 'Conciertos y Festivales' },
+  {value: 'teatro-arte', label: 'Teatro y Arte' },
+  { value: 'eventos-culturales', label: 'Eventos Culturales' },
   { value: 'txakoli', label: 'Rutas y catas de Txakoli' },
 ]
 
