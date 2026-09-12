@@ -1,31 +1,53 @@
 import { MongoClient } from 'mongodb'
-import { eventOptions, siteOptions } from '../../shared/catalog.js'
+import { eventOptions, siteOptions, zoneOptions } from '../../shared/catalog.js'
 
 let cachedClientPromise = null
 
-function normalizeDocument(document, fallbackType) {
+function normalizePlace(document) {
   return {
-    id: String(document.id ?? document._id ?? `${fallbackType}-${document.name ?? 'item'}`),
-    label: String(document.label ?? document.name ?? document.title ?? 'Punto sin nombre'),
-    city: String(document.city ?? document.municipality ?? document.locality ?? ''),
-    province: String(document.province ?? document.region ?? document.territory ?? ''),
-    setting: String(document.setting ?? document.activityMode ?? document.type ?? 'indiferente'),
-    tags: Array.isArray(document.tags)
-      ? document.tags.map((tag) => String(tag))
-      : Array.isArray(document.categories)
-        ? document.categories.map((tag) => String(tag))
-        : [],
-    transport: Array.isArray(document.transport)
-      ? document.transport.map((item) => String(item))
-      : Array.isArray(document.transportModes)
-        ? document.transportModes.map((item) => String(item))
-        : [],
-    durationHours: Number(document.durationHours ?? document.duration ?? 2),
-    priority: Number(document.priority ?? document.score ?? 75),
-    description: String(document.description ?? document.summary ?? ''),
-    coordinates: document.coordinates ?? document.geo ?? null,
+    id: String(document._id ?? document.documentName ?? 'place'),
+    label: String(document.documentName ?? 'Punto sin nombre'),
+    city: String(document.municipality ?? document.municipalitycode ?? ''),
+    province: String(document.territorycode ?? ''),
+    setting: String(document.templateType ?? document.category ?? 'indiferente'),
+    tags: [document.marks, document.templateType, document.category].filter(Boolean).map(String),
+    transport: [],
+    durationHours: 2,
+    priority: 75,
+    description: String(document.marks ?? document.templateType ?? 'Punto de interés turístico.'),
+    coordinates: document.latwgs84 && document.lonwgs84 ? [Number(document.latwgs84), Number(document.lonwgs84)] : null,
+    userCategory: String(document.user_category ?? ''),
     source: 'mongo',
   }
+}
+
+function normalizeEvent(document) {
+  return {
+    id: String(document.id ?? document._id ?? 'event'),
+    label: String(document.name ?? 'Evento sin nombre'),
+    city: String(document.municipality ?? ''),
+    province: String(document.countyId ?? ''),
+    setting: String(document.type_name ?? 'evento'),
+    tags: [document.type_name, document.user_category].filter(Boolean).map(String),
+    transport: [],
+    durationHours: 2,
+    priority: 80,
+    description: String(document.opening_hour ?? 'Evento cultural disponible en las fechas seleccionadas.'),
+    coordinates: document.location ?? null,
+    userCategory: String(document.user_category ?? ''),
+    startDate: document.startDate ?? null,
+    endDate: document.endDate ?? null,
+    source: 'mongo',
+  }
+}
+
+function getZoneCities(zoneId) {
+  return zoneOptions.find((zone) => zone.id === zoneId)?.cities ?? []
+}
+
+function getProvinceCode(zoneId) {
+  const province = zoneOptions.find((zone) => zone.id === zoneId)?.province
+  return province === 'Bizkaia' ? '48' : province === 'Gipuzkoa' ? '20' : province === 'Araba' ? '01' : null
 }
 
 async function getMongoClient(uri) {
@@ -61,7 +83,7 @@ function buildFallbackSnapshot() {
   }
 }
 
-export async function fetchCatalogSnapshot() {
+export async function fetchCatalogSnapshot(request = {}) {
   const uri = process.env.MONGODB_URI
 
   if (!uri) {
@@ -72,27 +94,35 @@ export async function fetchCatalogSnapshot() {
     const client = await getMongoClient(uri)
     const db = client.db(process.env.MONGODB_DB || 'routemind_euskadi')
 
+    const selectedCategories = Array.isArray(request.plans) ? request.plans : []
+    const cities = getZoneCities(request.zone)
+    const provinceCode = getProvinceCode(request.zone)
+    const startDate = new Date(request.startDate)
+    const endDate = new Date(request.endDate)
+    const dateFilter = { startDate: { $lte: endDate }, endDate: { $gte: startDate } }
+    const categoryFilter = selectedCategories.length ? { user_category: { $in: selectedCategories } } : {}
+    const cityFilter = cities.length ? { municipality: { $in: cities } } : {}
+    const weatherFilter = { date: { $gte: startDate, $lte: endDate }, ...(provinceCode ? { countyId: provinceCode } : {}) }
+
     const [places, events, weather] = await Promise.all([
-      db.collection('places').find({}).limit(24).toArray(),
-      db.collection('events').find({}).limit(24).toArray(),
-      db.collection('weather_forecasts').find({}).limit(12).toArray(),
+      db.collection('visit_points_user_category').find({ ...categoryFilter, ...cityFilter }).limit(100).toArray(),
+      db.collection('events_user_category').find({ ...dateFilter, ...categoryFilter, ...cityFilter }).limit(100).toArray(),
+      db.collection('weather_prediction_scoring').find(weatherFilter).sort({ date: 1 }).limit(31).toArray(),
     ])
 
-    const normalizedPlaces = places.map((document) => normalizeDocument(document, 'place'))
-    const normalizedEvents = events.map((document) => normalizeDocument(document, 'event'))
-
-    if (!normalizedPlaces.length && !normalizedEvents.length) {
-      return buildFallbackSnapshot()
-    }
+    const normalizedPlaces = places.map(normalizePlace)
+    const normalizedEvents = events.map(normalizeEvent)
 
     return {
       source: 'mongo',
-      places: normalizedPlaces.length ? normalizedPlaces : siteOptions,
-      events: normalizedEvents.length ? normalizedEvents : eventOptions,
+      filters: { selectedCategories, cities, provinceCode, startDate: request.startDate, endDate: request.endDate },
+      places: normalizedPlaces,
+      events: normalizedEvents,
       weather: weather.map((document) => ({
-        label: String(document.label ?? document.summary ?? 'Pronostico no disponible'),
-        recommendation: String(document.recommendation ?? document.note ?? ''),
-        dayPart: String(document.dayPart ?? document.period ?? 'general'),
+        date: document.date,
+        label: `Puntuación outdoor: ${Number(document.scoring_outdoor ?? 0).toFixed(2)}`,
+        recommendation: Number(document.scoring_outdoor ?? 0) >= 0.6 ? 'Buen contexto para actividades exteriores.' : 'Conviene priorizar actividades cubiertas.',
+        dayPart: 'general',
       })),
     }
   } catch {

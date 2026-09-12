@@ -1,6 +1,5 @@
 import { eventOptions, getCatalogSeed, getSitesByIds, getZoneById, paceOptions, preferenceOptions, siteOptions, transportOptions, zoneOptions } from '../../shared/catalog.js'
 import { fetchCatalogSnapshot } from './mongo.js'
-import { generateItineraryWithGemini } from './gemini.js'
 
 const MAX_PLAN_MONTHS = 3
 
@@ -60,8 +59,25 @@ function normalizeString(value, fallback) {
   return cleaned || fallback
 }
 
+function buildGeminiPrompt(request, catalog, selectedZone, rankings) {
+  return `Eres un planificador turístico experto en Euskadi. Crea un itinerario en JSON usando exclusivamente los datos disponibles y respetando las preferencias del viajero.
+
+DATOS DE ENTRADA:
+${JSON.stringify({ request, selectedZone }, null, 2)}
+
+DATOS REALES FILTRADOS DE MONGODB:
+${JSON.stringify({ places: catalog.places, events: catalog.events, weather: catalog.weather }, null, 2)}
+
+CLASIFICACIÓN PREVIA:
+${JSON.stringify(rankings, null, 2)}
+
+RESPUESTA REQUERIDA:
+Devuelve únicamente JSON con las claves title, summary, days, packingTips, transportNotes, backupPlan y sources. Distribuye las actividades dentro de las fechas solicitadas, considera el clima y no inventes lugares o eventos que no aparezcan en los datos proporcionados.`
+}
+
 export function normalizeTripRequest(input = {}) {
   const sites = Array.isArray(input.sites) ? input.sites : Array.isArray(input.siteIds) ? input.siteIds : []
+  const plans = Array.isArray(input.plans) ? input.plans.filter(Boolean).map(String) : []
 
   return {
     startDate: String(input.startDate ?? input.from ?? ''),
@@ -75,6 +91,7 @@ export function normalizeTripRequest(input = {}) {
     accessibility: normalizeString(input.accessibility ?? 'normal', 'normal'),
     focus: normalizeString(input.focus ?? 'equilibrio', 'equilibrio'),
     sites: sites.filter(Boolean).map((site) => String(site)).slice(0, 3),
+    plans,
     notes: String(input.notes ?? ''),
   }
 }
@@ -159,6 +176,10 @@ function scoreItem(item, request) {
     if (Array.isArray(item.tags) && item.tags.includes(request.preference)) {
       score += 10
     }
+  }
+
+  if (request.plans?.includes(item.userCategory)) {
+    score += 35
   }
 
   if (request.transport && Array.isArray(item.transport) && item.transport.includes(request.transport)) {
@@ -403,54 +424,12 @@ export async function planTrip(input = {}) {
   const catalog = await fetchCatalogSnapshot(request)
   const fallbackPlan = buildFallbackItinerary(request, catalog)
 
-  const promptPayload = {
-    request,
-    metadata: {
-      generatedAt: new Date().toISOString(),
-      maxPlanMonths: MAX_PLAN_MONTHS,
-      allowedPreferences: preferenceOptions,
-      allowedTransportModes: transportOptions,
-      allowedPaceOptions: paceOptions,
-    },
-    catalogSummary: {
-      source: catalog.source,
-      places: catalog.places.slice(0, 12),
-      events: catalog.events.slice(0, 8),
-      weather: catalog.weather.slice(0, 6),
-      selectedZone,
-    },
-    suggestedRankings: {
-      places: rankItems(catalog.places.length ? catalog.places : getCatalogSeed().places, request)
-        .slice(0, 8)
-        .map((item) => ({
-          id: item.id,
-          label: item.label,
-          city: item.city,
-          province: item.province,
-          setting: item.setting,
-          description: item.description,
-          score: item.score,
-        })),
-      events: rankItems(catalog.events.length ? catalog.events : getCatalogSeed().events, request)
-        .slice(0, 5)
-        .map((item) => ({
-          id: item.id,
-          label: item.label,
-          city: item.city,
-          province: item.province,
-          setting: item.setting,
-          description: item.description,
-          score: item.score,
-        })),
-    },
-    responseRules: {
-      format: 'json',
-      requiredKeys: ['title', 'summary', 'days', 'packingTips', 'transportNotes', 'backupPlan', 'sources'],
-      note: 'Return a concise but complete trip itinerary in JSON only.',
-    },
+  const rankings = {
+    places: rankItems(catalog.places.length ? catalog.places : getCatalogSeed().places, request).slice(0, 8),
+    events: rankItems(catalog.events.length ? catalog.events : getCatalogSeed().events, request).slice(0, 5),
   }
-
-  const geminiText = await generateItineraryWithGemini(promptPayload)
+  const debugPrompt = buildGeminiPrompt(request, catalog, selectedZone, rankings)
+  const geminiText = null
   const parsed = geminiText ? extractJson(geminiText) : null
   const itinerary = parsed ? normalizeGeminiPlan(parsed, fallbackPlan) : fallbackPlan
 
@@ -469,6 +448,12 @@ export async function planTrip(input = {}) {
       events: catalog.events.length,
       weatherBands: catalog.weather.length,
       previewDates: getTripDays(request).slice(0, 3).map((date) => isoDate(date)),
+    },
+    prompt: debugPrompt,
+    promptMetadata: {
+      mongoSource: catalog.source,
+      filters: catalog.filters ?? null,
+      collections: ['events_user_category', 'visit_points_user_category', 'weather_prediction_scoring'],
     },
     itinerary,
   }
