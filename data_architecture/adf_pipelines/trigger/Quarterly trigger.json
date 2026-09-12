@@ -9,6 +9,12 @@
 					"referenceName": "pl_ingestion_one_time_load_restaurants",
 					"type": "PipelineReference"
 				}
+			},
+			{
+				"pipelineReference": {
+					"referenceName": "pl_ingestion_one_time_load_natural_places",
+					"type": "PipelineReference"
+				}
 			}
 		],
 		"type": "ScheduleTrigger",
