@@ -46,7 +46,7 @@
 			"recurrence": {
 				"frequency": "Month",
 				"interval": 3,
-				"startTime": "2026-09-11T12:00:00",
+				"startTime": "2026-10-01T12:00:00",
 				"timeZone": "Romance Standard Time",
 				"schedule": {
 					"monthDays": [
