@@ -15,6 +15,12 @@
 					"referenceName": "pl_ingestion_one_time_load_natural_places",
 					"type": "PipelineReference"
 				}
+			},
+			{
+				"pipelineReference": {
+					"referenceName": "pl_ingestion_one_time_load_cultural_resources",
+					"type": "PipelineReference"
+				}
 			}
 		],
 		"type": "ScheduleTrigger",
