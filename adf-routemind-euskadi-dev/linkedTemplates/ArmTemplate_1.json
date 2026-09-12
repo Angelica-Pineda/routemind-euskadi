@@ -69,7 +69,10 @@
 								"type": "DatasetReference",
 								"parameters": {
 									"path": "restaurants",
-									"filename": "restaurants.json"
+									"filename": {
+										"value": "@concat('restaurant_', formatDateTime(utcNow(), 'yyyy_MM_dd'), '.json')",
+										"type": "Expression"
+									}
 								}
 							}
 						]
@@ -137,7 +140,10 @@
 								"type": "DatasetReference",
 								"parameters": {
 									"path": "weather/stations",
-									"filename": "weather_stations.json"
+									"filename": {
+										"value": "@concat('weather_stations_', formatDateTime(utcNow(), 'yyyy_MM_dd'), '.json')",
+										"type": "Expression"
+									}
 								}
 							}
 						]

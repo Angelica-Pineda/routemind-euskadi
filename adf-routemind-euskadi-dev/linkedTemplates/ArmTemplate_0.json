@@ -849,7 +849,10 @@
 								"type": "DatasetReference",
 								"parameters": {
 									"path": "weather/air_quality/stations",
-									"filename": "air_quality_stations.json"
+									"filename": {
+										"value": "@concat('air_quality_stations_', formatDateTime(utcNow(), 'yyyy_MM_dd'), '.json')",
+										"type": "Expression"
+									}
 								}
 							}
 						]
@@ -922,7 +925,10 @@
 								"type": "DatasetReference",
 								"parameters": {
 									"path": "cultural",
-									"filename": "cultural_buildings.xml"
+									"filename": {
+										"value": "@concat('cultural_buildings_', formatDateTime(utcNow(), 'yyyy_MM_dd'), '.xml')\n",
+										"type": "Expression"
+									}
 								}
 							}
 						]
@@ -995,7 +1001,10 @@
 								"type": "DatasetReference",
 								"parameters": {
 									"path": "cultural",
-									"filename": "cultural_places.json"
+									"filename": {
+										"value": "@concat('cultural_places_', formatDateTime(utcNow(), 'yyyy_MM_dd'), '.json')\n",
+										"type": "Expression"
+									}
 								}
 							}
 						]
@@ -1134,7 +1143,10 @@
 								"type": "DatasetReference",
 								"parameters": {
 									"path": "cultural",
-									"filename": "natural_places.json"
+									"filename": {
+										"value": "@concat('natural_places_', formatDateTime(utcNow(), 'yyyy_MM_dd'), '.json')\n",
+										"type": "Expression"
+									}
 								}
 							}
 						]
