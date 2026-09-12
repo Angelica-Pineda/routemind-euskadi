@@ -53,7 +53,10 @@
 						"type": "DatasetReference",
 						"parameters": {
 							"path": "cultural",
-							"filename": "natural_places.json"
+							"filename": {
+								"value": "@concat('natural_places_', formatDateTime(utcNow(), 'yyyy_MM_dd'), '.json')\n",
+								"type": "Expression"
+							}
 						}
 					}
 				]

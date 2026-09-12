@@ -1,0 +1,59 @@
+{
+	"name": "Quarterly trigger",
+	"properties": {
+		"annotations": [],
+		"runtimeState": "Stopped",
+		"pipelines": [
+			{
+				"pipelineReference": {
+					"referenceName": "pl_ingestion_one_time_load_restaurants",
+					"type": "PipelineReference"
+				}
+			},
+			{
+				"pipelineReference": {
+					"referenceName": "pl_ingestion_one_time_load_natural_places",
+					"type": "PipelineReference"
+				}
+			},
+			{
+				"pipelineReference": {
+					"referenceName": "pl_ingestion_one_time_load_cultural_resources",
+					"type": "PipelineReference"
+				}
+			},
+			{
+				"pipelineReference": {
+					"referenceName": "pl_ingestion_one_time_load_air_quiality_station",
+					"type": "PipelineReference"
+				}
+			},
+			{
+				"pipelineReference": {
+					"referenceName": "pl_ingestion_one_time_load_weather_station",
+					"type": "PipelineReference"
+				}
+			},
+			{
+				"pipelineReference": {
+					"referenceName": "pl_ingestion_one_time_load_cultural_buildings",
+					"type": "PipelineReference"
+				}
+			}
+		],
+		"type": "ScheduleTrigger",
+		"typeProperties": {
+			"recurrence": {
+				"frequency": "Month",
+				"interval": 3,
+				"startTime": "2026-10-01T12:00:00",
+				"timeZone": "Romance Standard Time",
+				"schedule": {
+					"monthDays": [
+						1
+					]
+				}
+			}
+		}
+	}
+}

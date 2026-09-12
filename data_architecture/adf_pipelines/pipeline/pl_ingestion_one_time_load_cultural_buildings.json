@@ -53,7 +53,10 @@
 						"type": "DatasetReference",
 						"parameters": {
 							"path": "cultural",
-							"filename": "cultural_buildings.xml"
+							"filename": {
+								"value": "@concat('cultural_buildings_', formatDateTime(utcNow(), 'yyyy_MM_dd'), '.xml')\n",
+								"type": "Expression"
+							}
 						}
 					}
 				]
