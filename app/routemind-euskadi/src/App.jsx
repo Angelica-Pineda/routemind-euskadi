@@ -7,6 +7,8 @@ import { HowItWorksSection } from './components/home/HowItWorksSection'
 import { ZoneMapPreview } from './components/map/ZoneMapPreview'
 import { PlannerForm } from './components/planner/PlannerForm'
 import { MongoPromptPreview } from './components/planner/MongoPromptPreview'
+import { AiStatusNotice } from './components/planner/AiStatusNotice'
+import { GeminiLoader } from './components/planner/GeminiLoader'
 import { ItineraryResult } from './components/itinerary/ItineraryResult'
 import './App.css'
 import 'leaflet/dist/leaflet.css'
@@ -52,22 +54,34 @@ function App() {
     return () => { cancelled = true }
   }, [])
 
+  useEffect(() => {
+    if (!result?.ai) return
+
+    result.ai.attempts?.forEach((attempt) => {
+      const method = attempt.ok ? 'info' : 'warn'
+      console[method](`[Gemini] Modelo ${attempt.model}. Código: ${attempt.responseCode}. Estado: ${attempt.ok ? 'correcto' : 'fallido'}`)
+    })
+  }, [result])
+
   function updateField(field, value) { setForm((current) => ({ ...current, [field]: value })) }
   function handleZoneSelect(zoneId) { const zone = zoneOptions.find((item) => item.id === zoneId); setForm((current) => ({ ...current, zone: zoneId, sites: zone?.siteIds?.length ? zone.siteIds.slice(0, 3) : current.sites })) }
   function toggleSite(siteId) { setForm((current) => { const alreadySelected = current.sites.includes(siteId); if (alreadySelected) return { ...current, sites: current.sites.filter((item) => item !== siteId) }; if (current.sites.length >= 3) return current; return { ...current, sites: [...current.sites, siteId] } }) }
   async function handleSubmit(event) {
     event.preventDefault(); setStatus('loading'); setError('')
+    console.info('[Gemini] Iniciando generación. Orden de modelos: gemini-3.8-flash -> gemini-3.7-flash -> gemini-3.6-flash -> gemini-3.5-flash -> gemini-3-flash-preview -> gemini-2.5-flash')
     try { const payload = await requestItinerary({ ...form, startDate: form.dateRange.startDate, endDate: form.dateRange.endDate }); setResult(payload); setStatus('success') }
     catch (requestError) { setStatus('error'); setError(requestError.message || 'No se pudo generar el itinerario.') }
   }
 
   return <div className="relative min-h-screen bg-zinc-950 font-sans text-zinc-100 selection:bg-orange-500/30 selection:text-orange-100">
+    {status === 'loading' ? <GeminiLoader /> : null}
     <HeroSection heroCards={heroCards} EuskadiFlag={EuskadiFlag} />
     <HowItWorksSection />
     <main id="mapa-zonas" className="relative z-10 mx-auto flex w-full max-w-7xl flex-col gap-10 px-4 py-16 sm:px-6 lg:gap-14 lg:px-8 lg:py-24"><section className="space-y-8">
       <ZoneMapPreview selectedZone={selectedZone} onSelectZone={handleZoneSelect} />
       <PlannerForm form={form} health={health} status={status} error={error} tripDurationDays={tripDurationDays} activeStep={activeStep} selectedZone={selectedZone} selectedZoneSites={selectedZoneSites} defaultStartDate={defaultStartDate} maxDate={maxDate} onSubmit={handleSubmit} updateField={updateField} toggleSite={toggleSite} />
       <MongoPromptPreview result={result} />
+      <AiStatusNotice result={result} />
       <ItineraryResult result={result} status={status} selectedZone={selectedZone} />
     </section></main>
     <Footer />

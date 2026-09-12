@@ -1,7 +1,14 @@
 import { eventOptions, getCatalogSeed, getSitesByIds, getZoneById, paceOptions, preferenceOptions, siteOptions, transportOptions, zoneOptions } from '../../shared/catalog.js'
 import { fetchCatalogSnapshot } from './mongo.js'
+import { generateItineraryWithGemini } from './gemini.js'
 
 const MAX_PLAN_MONTHS = 3
+
+const TERRITORY_CODES = {
+  Araba: '01',
+  Gipuzkoa: '20',
+  Bizkaia: '48',
+}
 
 function startOfDay(date) {
   const normalized = new Date(date)
@@ -59,20 +66,104 @@ function normalizeString(value, fallback) {
   return cleaned || fallback
 }
 
+function getSelectedTerritoryCodes(zone) {
+  const code = TERRITORY_CODES[zone?.province]
+  return code ? [code] : []
+}
+
+function getItemTerritoryCodes(item) {
+  if (Array.isArray(item.territoryCodes)) {
+    return item.territoryCodes
+  }
+
+  const code = TERRITORY_CODES[item.province]
+  return code ? [code] : []
+}
+
 function buildGeminiPrompt(request, catalog, selectedZone, rankings) {
-  return `Eres un planificador turístico experto en Euskadi. Crea un itinerario en JSON usando exclusivamente los datos disponibles y respetando las preferencias del viajero.
+  const input = {
+    dates: { start: request.startDate, end: request.endDate },
+    preferences: {
+      plans: request.plans,
+      transport: request.transport,
+      pace: request.pace,
+      budget: request.budget,
+      partySize: request.partySize,
+    },
+    zone: selectedZone?.label,
+    selectedSites: request.sites,
+  }
 
-DATOS DE ENTRADA:
-${JSON.stringify({ request, selectedZone }, null, 2)}
+  const places = catalog.places.map((place) => ({
+    id: place.id,
+    name: place.label,
+    city: place.city,
+    category: place.userCategory,
+    type: place.setting,
+    description: place.description,
+    coordinates: place.coordinates,
+  }))
+  const events = catalog.events.map((event) => ({
+    id: event.id,
+    name: event.label,
+    city: event.city,
+    category: event.userCategory,
+    type: event.setting,
+    description: event.description,
+    startDate: event.startDate,
+    endDate: event.endDate,
+  }))
+  const weather = catalog.weather.map((item) => ({
+    date: item.date,
+    outdoorScore: item.outdoorScore,
+    recommendation: item.recommendation,
+  }))
 
-DATOS REALES FILTRADOS DE MONGODB:
-${JSON.stringify({ places: catalog.places, events: catalog.events, weather: catalog.weather }, null, 2)}
+  const responseSchema = {
+    title: 'string',
+    summary: 'string',
+    days: [{
+      date: 'YYYY-MM-DD',
+      label: 'string',
+      theme: 'string',
+      morning: { title: 'string', place: 'string', reason: 'string', setting: 'string' },
+      midday: { title: 'string', place: 'string', reason: 'string', setting: 'string' },
+      afternoon: { title: 'string', place: 'string', reason: 'string', setting: 'string' },
+      evening: { title: 'string', place: 'string', reason: 'string', setting: 'string' },
+      weatherNote: 'string',
+      transportNote: 'string',
+      notes: ['string'],
+    }],
+    packingTips: ['string'],
+    transportNotes: ['string'],
+    backupPlan: ['string'],
+    sources: {
+      catalogSource: 'string',
+      selectedZone: 'string',
+      selectedSites: ['string'],
+    },
+  }
 
-CLASIFICACIÓN PREVIA:
+  return `Eres un planificador turístico experto en Euskadi. Genera un itinerario usando únicamente los lugares, eventos y clima proporcionados.
+
+PREFERENCIAS DE USUARIO DEL VIAJE:
+${JSON.stringify(input, null, 2)}
+
+DATOS FILTRADOS A TENER EN CUENTA:
+${JSON.stringify({ places, events, weather }, null, 2)}
+
+CLASIFICACIÓN:
 ${JSON.stringify(rankings, null, 2)}
 
-RESPUESTA REQUERIDA:
-Devuelve únicamente JSON con las claves title, summary, days, packingTips, transportNotes, backupPlan y sources. Distribuye las actividades dentro de las fechas solicitadas, considera el clima y no inventes lugares o eventos que no aparezcan en los datos proporcionados.`
+REGLAS OBLIGATORIAS:
+1. Respeta las fechas, planes, transporte, ritmo, presupuesto y número de personas.
+2. No inventes lugares, eventos, fechas ni datos meteorológicos.
+3. Usa null cuando un bloque del día no tenga una actividad adecuada.
+4. Responde únicamente con JSON válido, sin Markdown, sin comentarios y sin texto adicional.
+5. Mantén exactamente las claves, tipos y estructura de este esquema. No añadas, elimines ni renombres propiedades:
+${JSON.stringify(responseSchema, null, 2)}
+
+Cada actividad debe tener esta estructura cuando no sea null: {"title":"string","place":"string","reason":"string","setting":"string"}.`
 }
 
 export function normalizeTripRequest(input = {}) {
@@ -166,6 +257,11 @@ function scoreItem(item, request) {
     if (Array.isArray(selectedZone.cities) && selectedZone.cities.includes(item.city)) {
       score += 15
     }
+
+    const selectedTerritoryCodes = getSelectedTerritoryCodes(selectedZone)
+    if (selectedTerritoryCodes.some((code) => getItemTerritoryCodes(item).includes(code))) {
+      score += 30
+    }
   }
 
   if (request.preference !== 'indiferente') {
@@ -180,10 +276,6 @@ function scoreItem(item, request) {
 
   if (request.plans?.includes(item.userCategory)) {
     score += 35
-  }
-
-  if (request.transport && Array.isArray(item.transport) && item.transport.includes(request.transport)) {
-    score += 15
   }
 
   if (request.pace === 'relajado' && Number(item.durationHours ?? 2) <= 3) {
@@ -384,20 +476,22 @@ function normalizeGeminiPlan(parsedPlan, fallbackPlan) {
       const fallbackDay = fallbackPlan.days[index] ?? fallbackPlan.days[0] ?? null
 
       if (!fallbackDay) {
-        return day
+        return null
       }
 
+      const safeDay = day && typeof day === 'object' ? day : {}
+
       return {
-        date: String(day.date ?? fallbackDay.date),
-        label: String(day.label ?? day.title ?? fallbackDay.label),
-        theme: String(day.theme ?? fallbackDay.theme),
-        morning: day.morning ?? fallbackDay.morning,
-        midday: day.midday ?? fallbackDay.midday,
-        afternoon: day.afternoon ?? fallbackDay.afternoon,
-        evening: day.evening ?? fallbackDay.evening,
-        weatherNote: String(day.weatherNote ?? day.weather ?? fallbackDay.weatherNote ?? ''),
-        transportNote: String(day.transportNote ?? fallbackDay.transportNote ?? ''),
-        notes: Array.isArray(day.notes) ? day.notes : fallbackDay.notes,
+        date: String(safeDay.date ?? fallbackDay.date),
+        label: String(safeDay.label ?? safeDay.title ?? fallbackDay.label),
+        theme: String(safeDay.theme ?? fallbackDay.theme),
+        morning: normalizeActivity(safeDay.morning, fallbackDay.morning),
+        midday: normalizeActivity(safeDay.midday, fallbackDay.midday),
+        afternoon: normalizeActivity(safeDay.afternoon, fallbackDay.afternoon),
+        evening: normalizeActivity(safeDay.evening, fallbackDay.evening),
+        weatherNote: String(safeDay.weatherNote ?? safeDay.weather ?? fallbackDay.weatherNote ?? ''),
+        transportNote: String(safeDay.transportNote ?? fallbackDay.transportNote ?? ''),
+        notes: Array.isArray(safeDay.notes) ? safeDay.notes.map(String) : fallbackDay.notes,
       }
     }),
     packingTips: Array.isArray(parsedPlan.packingTips) ? parsedPlan.packingTips : fallbackPlan.packingTips,
@@ -405,7 +499,38 @@ function normalizeGeminiPlan(parsedPlan, fallbackPlan) {
       ? parsedPlan.transportNotes
       : fallbackPlan.transportNotes,
     backupPlan: Array.isArray(parsedPlan.backupPlan) ? parsedPlan.backupPlan : fallbackPlan.backupPlan,
-    sources: parsedPlan.sources ?? fallbackPlan.sources,
+    sources: normalizeSources(parsedPlan.sources, fallbackPlan.sources),
+  }
+}
+
+function normalizeActivity(activity, fallbackActivity) {
+  if (activity === null) {
+    return null
+  }
+
+  const candidate = activity && typeof activity === 'object' ? activity : fallbackActivity
+
+  if (!candidate) {
+    return null
+  }
+
+  return {
+    title: String(candidate.title ?? ''),
+    place: String(candidate.place ?? ''),
+    reason: String(candidate.reason ?? ''),
+    setting: String(candidate.setting ?? ''),
+  }
+}
+
+function toPromptItem(item) {
+  return {
+    id: item.id,
+    name: item.label,
+    city: item.city,
+    territoryCodes: item.territoryCodes ?? [],
+    category: item.userCategory,
+    type: item.setting,
+    score: item.score,
   }
 }
 
@@ -425,17 +550,18 @@ export async function planTrip(input = {}) {
   const fallbackPlan = buildFallbackItinerary(request, catalog)
 
   const rankings = {
-    places: rankItems(catalog.places.length ? catalog.places : getCatalogSeed().places, request).slice(0, 8),
-    events: rankItems(catalog.events.length ? catalog.events : getCatalogSeed().events, request).slice(0, 5),
+    places: rankItems(catalog.places.length ? catalog.places : getCatalogSeed().places, request).slice(0, 8).map(toPromptItem),
+    events: rankItems(catalog.events.length ? catalog.events : getCatalogSeed().events, request).slice(0, 5).map(toPromptItem),
   }
   const debugPrompt = buildGeminiPrompt(request, catalog, selectedZone, rankings)
-  const geminiText = null
-  const parsed = geminiText ? extractJson(geminiText) : null
+  const geminiResult = await generateItineraryWithGemini(debugPrompt)
+  const parsed = geminiResult.text ? extractJson(geminiResult.text) : null
   const itinerary = parsed ? normalizeGeminiPlan(parsed, fallbackPlan) : fallbackPlan
+  const aiSucceeded = Boolean(parsed)
 
   return {
     ok: true,
-    source: geminiText ? `gemini:${catalog.source}` : `fallback:${catalog.source}`,
+    source: aiSucceeded ? `gemini:${catalog.source}` : `fallback:${catalog.source}`,
     request: {
       ...request,
       startDate: isoDate(toDate(request.startDate)),
@@ -455,6 +581,23 @@ export async function planTrip(input = {}) {
       filters: catalog.filters ?? null,
       collections: ['events_user_category', 'visit_points_user_category', 'weather_prediction_scoring'],
     },
+    ai: {
+      ok: aiSucceeded,
+      model: geminiResult.model,
+      responseCode: geminiResult.responseCode ?? null,
+      attempts: geminiResult.attempts,
+      fallbackReason: aiSucceeded ? null : geminiResult.reason ?? 'invalid_json_response',
+    },
     itinerary,
+  }
+}
+
+function normalizeSources(sources, fallbackSources) {
+  const candidate = sources && typeof sources === 'object' ? sources : fallbackSources
+
+  return {
+    catalogSource: String(candidate?.catalogSource ?? ''),
+    selectedZone: String(candidate?.selectedZone ?? ''),
+    selectedSites: Array.isArray(candidate?.selectedSites) ? candidate.selectedSites.map(String) : [],
   }
 }
