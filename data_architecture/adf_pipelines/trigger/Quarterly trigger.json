@@ -21,6 +21,12 @@
 					"referenceName": "pl_ingestion_one_time_load_cultural_resources",
 					"type": "PipelineReference"
 				}
+			},
+			{
+				"pipelineReference": {
+					"referenceName": "pl_ingestion_one_time_load_air_quiality_station",
+					"type": "PipelineReference"
+				}
 			}
 		],
 		"type": "ScheduleTrigger",
