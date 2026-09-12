@@ -27,6 +27,12 @@
 					"referenceName": "pl_ingestion_one_time_load_air_quiality_station",
 					"type": "PipelineReference"
 				}
+			},
+			{
+				"pipelineReference": {
+					"referenceName": "pl_ingestion_one_time_load_weather_station",
+					"type": "PipelineReference"
+				}
 			}
 		],
 		"type": "ScheduleTrigger",
