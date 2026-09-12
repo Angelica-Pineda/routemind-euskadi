@@ -11,6 +11,10 @@
 			"type": "string",
 			"defaultValue": "https://stroutemindeuskadidev.dfs.core.windows.net/"
 		},
+		"LS_HTTP_Eustat_properties_typeProperties_url": {
+			"type": "string",
+			"defaultValue": "https://www.eustat.eus/"
+		},
 		"LS_HTTP_OpenDataEuskadi_properties_typeProperties_url": {
 			"type": "string",
 			"defaultValue": "https://opendata.euskadi.eus"
@@ -777,13 +781,15 @@
 						"userProperties": [],
 						"typeProperties": {
 							"source": {
-								"type": "JsonSource",
+								"type": "XmlSource",
 								"storeSettings": {
 									"type": "HttpReadSettings",
 									"requestMethod": "GET"
 								},
 								"formatSettings": {
-									"type": "JsonReadSettings"
+									"type": "XmlReadSettings",
+									"validationMode": "none",
+									"namespaces": true
 								}
 							},
 							"sink": {
@@ -799,10 +805,10 @@
 						},
 						"inputs": [
 							{
-								"referenceName": "ds_http_flatfiles",
+								"referenceName": "ds_http_xml_flatfiles",
 								"type": "DatasetReference",
 								"parameters": {
-									"url_data": "/contenidos/ds_recursos_turisticos/patrimonio_recursos_culturales/opendata/recursos-culturales.json"
+									"url_data": "/contenidos/ds_recursos_turisticos/patrimonio_recursos_culturales/opendata/recursos-culturales.xml"
 								}
 							}
 						],
@@ -824,7 +830,73 @@
 				"annotations": []
 			},
 			"dependsOn": [
-				"[concat(variables('factoryId'), '/datasets/ds_http_flatfiles')]",
+				"[concat(variables('factoryId'), '/datasets/ds_http_xml_flatfiles')]",
+				"[concat(variables('factoryId'), '/datasets/ds_adls_flatfiles')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/pl_ingestion_one_time_load_municipality_codes')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"activities": [
+					{
+						"name": "Copy data1",
+						"type": "Copy",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "ExcelSource",
+								"storeSettings": {
+									"type": "HttpReadSettings",
+									"requestMethod": "GET"
+								}
+							},
+							"sink": {
+								"type": "JsonSink",
+								"storeSettings": {
+									"type": "AzureBlobFSWriteSettings"
+								},
+								"formatSettings": {
+									"type": "JsonWriteSettings"
+								}
+							},
+							"enableStaging": false
+						},
+						"inputs": [
+							{
+								"referenceName": "DS_HTTP_Excel_municipality",
+								"type": "DatasetReference",
+								"parameters": {}
+							}
+						],
+						"outputs": [
+							{
+								"referenceName": "ds_adls_flatfiles",
+								"type": "DatasetReference",
+								"parameters": {
+									"path": "municipality_codes",
+									"filename": "municipality_codes.json"
+								}
+							}
+						]
+					}
+				],
+				"policy": {
+					"elapsedTimeMetric": {}
+				},
+				"annotations": []
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/datasets/DS_HTTP_Excel_municipality')]",
 				"[concat(variables('factoryId'), '/datasets/ds_adls_flatfiles')]"
 			]
 		},
@@ -848,13 +920,15 @@
 						"userProperties": [],
 						"typeProperties": {
 							"source": {
-								"type": "JsonSource",
+								"type": "XmlSource",
 								"storeSettings": {
 									"type": "HttpReadSettings",
 									"requestMethod": "GET"
 								},
 								"formatSettings": {
-									"type": "JsonReadSettings"
+									"type": "XmlReadSettings",
+									"validationMode": "none",
+									"namespaces": true
 								}
 							},
 							"sink": {
@@ -870,10 +944,10 @@
 						},
 						"inputs": [
 							{
-								"referenceName": "ds_http_flatfiles",
+								"referenceName": "ds_http_xml_flatfiles",
 								"type": "DatasetReference",
 								"parameters": {
-									"url_data": "/contenidos/ds_recursos_turisticos/espacios_naturales_euskadi/opendata/espacios-naturales.json"
+									"url_data": "/contenidos/ds_recursos_turisticos/espacios_naturales_euskadi/opendata/espacios-naturales.xml"
 								}
 							}
 						],
@@ -895,7 +969,7 @@
 				"annotations": []
 			},
 			"dependsOn": [
-				"[concat(variables('factoryId'), '/datasets/ds_http_flatfiles')]",
+				"[concat(variables('factoryId'), '/datasets/ds_http_xml_flatfiles')]",
 				"[concat(variables('factoryId'), '/datasets/ds_adls_flatfiles')]"
 			]
 		},
@@ -919,13 +993,15 @@
 						"userProperties": [],
 						"typeProperties": {
 							"source": {
-								"type": "JsonSource",
+								"type": "XmlSource",
 								"storeSettings": {
 									"type": "HttpReadSettings",
 									"requestMethod": "GET"
 								},
 								"formatSettings": {
-									"type": "JsonReadSettings"
+									"type": "XmlReadSettings",
+									"validationMode": "none",
+									"namespaces": true
 								}
 							},
 							"sink": {
@@ -941,10 +1017,10 @@
 						},
 						"inputs": [
 							{
-								"referenceName": "ds_http_flatfiles",
+								"referenceName": "ds_http_xml_flatfiles",
 								"type": "DatasetReference",
 								"parameters": {
-									"url_data": "/contenidos/ds_recursos_turisticos/restaurantes_sidrerias_bodegas/opendata/restaurantes.json"
+									"url_data": "/contenidos/ds_recursos_turisticos/restaurantes_sidrerias_bodegas/opendata/restaurantes.xml"
 								}
 							}
 						],
@@ -966,7 +1042,7 @@
 				"annotations": []
 			},
 			"dependsOn": [
-				"[concat(variables('factoryId'), '/datasets/ds_http_flatfiles')]",
+				"[concat(variables('factoryId'), '/datasets/ds_http_xml_flatfiles')]",
 				"[concat(variables('factoryId'), '/datasets/ds_adls_flatfiles')]"
 			]
 		},
@@ -1198,6 +1274,35 @@
 			"dependsOn": [
 				"[concat(variables('factoryId'), '/datasets/ds_http_flatfiles')]",
 				"[concat(variables('factoryId'), '/datasets/ds_adls_flatfiles')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/DS_HTTP_Excel_municipality')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "LS_HTTP_Eustat",
+					"type": "LinkedServiceReference"
+				},
+				"folder": {
+					"name": "Source"
+				},
+				"annotations": [],
+				"type": "Excel",
+				"typeProperties": {
+					"location": {
+						"type": "HttpServerLocation",
+						"relativeUrl": "documentos/datos/codigos/Euskadi.xls"
+					},
+					"sheetIndex": 0,
+					"range": "A14",
+					"firstRowAsHeader": true
+				},
+				"schema": []
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/LS_HTTP_Eustat')]"
 			]
 		},
 		{
@@ -1465,6 +1570,21 @@
 			"dependsOn": []
 		},
 		{
+			"name": "[concat(parameters('factoryName'), '/LS_HTTP_Eustat')]",
+			"type": "Microsoft.DataFactory/factories/linkedServices",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"annotations": [],
+				"type": "HttpServer",
+				"typeProperties": {
+					"url": "[parameters('LS_HTTP_Eustat_properties_typeProperties_url')]",
+					"enableServerCertificateValidation": true,
+					"authenticationType": "Anonymous"
+				}
+			},
+			"dependsOn": []
+		},
+		{
 			"name": "[concat(parameters('factoryName'), '/LS_HTTP_OpenDataEuskadi')]",
 			"type": "Microsoft.DataFactory/factories/linkedServices",
 			"apiVersion": "2018-06-01",
@@ -1493,6 +1613,119 @@
 				}
 			},
 			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/Daily trigger')]",
+			"type": "Microsoft.DataFactory/factories/triggers",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"annotations": [],
+				"runtimeState": "Stopped",
+				"pipelines": [
+					{
+						"pipelineReference": {
+							"referenceName": "pl_ingestion_daily_api_cultural_events",
+							"type": "PipelineReference"
+						},
+						"parameters": {}
+					}
+				],
+				"type": "ScheduleTrigger",
+				"typeProperties": {
+					"recurrence": {
+						"frequency": "Day",
+						"interval": 1,
+						"startTime": "2026-09-11T12:00:00",
+						"timeZone": "Romance Standard Time",
+						"schedule": {
+							"minutes": [
+								0
+							],
+							"hours": [
+								12
+							]
+						}
+					}
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/pipelines/pl_ingestion_daily_api_cultural_events')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/Quarterly trigger')]",
+			"type": "Microsoft.DataFactory/factories/triggers",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"annotations": [],
+				"runtimeState": "Stopped",
+				"pipelines": [
+					{
+						"pipelineReference": {
+							"referenceName": "pl_ingestion_one_time_load_restaurants",
+							"type": "PipelineReference"
+						},
+						"parameters": {}
+					},
+					{
+						"pipelineReference": {
+							"referenceName": "pl_ingestion_one_time_load_natural_places",
+							"type": "PipelineReference"
+						},
+						"parameters": {}
+					},
+					{
+						"pipelineReference": {
+							"referenceName": "pl_ingestion_one_time_load_cultural_resources",
+							"type": "PipelineReference"
+						},
+						"parameters": {}
+					},
+					{
+						"pipelineReference": {
+							"referenceName": "pl_ingestion_one_time_load_air_quiality_station",
+							"type": "PipelineReference"
+						},
+						"parameters": {}
+					},
+					{
+						"pipelineReference": {
+							"referenceName": "pl_ingestion_one_time_load_weather_station",
+							"type": "PipelineReference"
+						},
+						"parameters": {}
+					},
+					{
+						"pipelineReference": {
+							"referenceName": "pl_ingestion_one_time_load_cultural_buildings",
+							"type": "PipelineReference"
+						},
+						"parameters": {}
+					}
+				],
+				"type": "ScheduleTrigger",
+				"typeProperties": {
+					"recurrence": {
+						"frequency": "Month",
+						"interval": 3,
+						"startTime": "2026-09-11T12:00:00",
+						"timeZone": "Romance Standard Time",
+						"schedule": {
+							"monthDays": [
+								1
+							]
+						}
+					}
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/pipelines/pl_ingestion_one_time_load_restaurants')]",
+				"[concat(variables('factoryId'), '/pipelines/pl_ingestion_one_time_load_natural_places')]",
+				"[concat(variables('factoryId'), '/pipelines/pl_ingestion_one_time_load_cultural_resources')]",
+				"[concat(variables('factoryId'), '/pipelines/pl_ingestion_one_time_load_air_quiality_station')]",
+				"[concat(variables('factoryId'), '/pipelines/pl_ingestion_one_time_load_weather_station')]",
+				"[concat(variables('factoryId'), '/pipelines/pl_ingestion_one_time_load_cultural_buildings')]"
+			]
 		}
 	]
 }

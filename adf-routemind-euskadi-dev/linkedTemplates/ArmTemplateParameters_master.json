@@ -8,6 +8,9 @@
 		"LS_ADLS_Bronze_properties_typeProperties_url": {
 			"value": "https://stroutemindeuskadidev.dfs.core.windows.net/"
 		},
+		"LS_HTTP_Eustat_properties_typeProperties_url": {
+			"value": "https://www.eustat.eus/"
+		},
 		"LS_HTTP_OpenDataEuskadi_properties_typeProperties_url": {
 			"value": "https://opendata.euskadi.eus"
 		},

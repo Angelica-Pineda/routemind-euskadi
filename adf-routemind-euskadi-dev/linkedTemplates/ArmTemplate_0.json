@@ -11,6 +11,10 @@
 			"type": "string",
 			"defaultValue": "https://stroutemindeuskadidev.dfs.core.windows.net/"
 		},
+		"LS_HTTP_Eustat_properties_typeProperties_url": {
+			"type": "string",
+			"defaultValue": "https://www.eustat.eus/"
+		},
 		"LS_HTTP_OpenDataEuskadi_properties_typeProperties_url": {
 			"type": "string",
 			"defaultValue": "https://opendata.euskadi.eus"
@@ -33,6 +37,21 @@
 				"type": "AzureBlobFS",
 				"typeProperties": {
 					"url": "[parameters('LS_ADLS_Bronze_properties_typeProperties_url')]"
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/LS_HTTP_Eustat')]",
+			"type": "Microsoft.DataFactory/factories/linkedServices",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"annotations": [],
+				"type": "HttpServer",
+				"typeProperties": {
+					"url": "[parameters('LS_HTTP_Eustat_properties_typeProperties_url')]",
+					"enableServerCertificateValidation": true,
+					"authenticationType": "Anonymous"
 				}
 			},
 			"dependsOn": []
@@ -66,6 +85,35 @@
 				}
 			},
 			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/DS_HTTP_Excel_municipality')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "LS_HTTP_Eustat",
+					"type": "LinkedServiceReference"
+				},
+				"folder": {
+					"name": "Source"
+				},
+				"annotations": [],
+				"type": "Excel",
+				"typeProperties": {
+					"location": {
+						"type": "HttpServerLocation",
+						"relativeUrl": "documentos/datos/codigos/Euskadi.xls"
+					},
+					"sheetIndex": 0,
+					"range": "A14",
+					"firstRowAsHeader": true
+				},
+				"schema": []
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/LS_HTTP_Eustat')]"
+			]
 		},
 		{
 			"name": "[concat(parameters('factoryName'), '/ds_adls_flatfiles')]",
@@ -910,13 +958,15 @@
 						"userProperties": [],
 						"typeProperties": {
 							"source": {
-								"type": "JsonSource",
+								"type": "XmlSource",
 								"storeSettings": {
 									"type": "HttpReadSettings",
 									"requestMethod": "GET"
 								},
 								"formatSettings": {
-									"type": "JsonReadSettings"
+									"type": "XmlReadSettings",
+									"validationMode": "none",
+									"namespaces": true
 								}
 							},
 							"sink": {
@@ -932,10 +982,10 @@
 						},
 						"inputs": [
 							{
-								"referenceName": "ds_http_flatfiles",
+								"referenceName": "ds_http_xml_flatfiles",
 								"type": "DatasetReference",
 								"parameters": {
-									"url_data": "/contenidos/ds_recursos_turisticos/patrimonio_recursos_culturales/opendata/recursos-culturales.json"
+									"url_data": "/contenidos/ds_recursos_turisticos/patrimonio_recursos_culturales/opendata/recursos-culturales.xml"
 								}
 							}
 						],
@@ -957,7 +1007,73 @@
 				"annotations": []
 			},
 			"dependsOn": [
-				"[concat(variables('factoryId'), '/datasets/ds_http_flatfiles')]",
+				"[concat(variables('factoryId'), '/datasets/ds_http_xml_flatfiles')]",
+				"[concat(variables('factoryId'), '/datasets/ds_adls_flatfiles')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/pl_ingestion_one_time_load_municipality_codes')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"activities": [
+					{
+						"name": "Copy data1",
+						"type": "Copy",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "ExcelSource",
+								"storeSettings": {
+									"type": "HttpReadSettings",
+									"requestMethod": "GET"
+								}
+							},
+							"sink": {
+								"type": "JsonSink",
+								"storeSettings": {
+									"type": "AzureBlobFSWriteSettings"
+								},
+								"formatSettings": {
+									"type": "JsonWriteSettings"
+								}
+							},
+							"enableStaging": false
+						},
+						"inputs": [
+							{
+								"referenceName": "DS_HTTP_Excel_municipality",
+								"type": "DatasetReference",
+								"parameters": {}
+							}
+						],
+						"outputs": [
+							{
+								"referenceName": "ds_adls_flatfiles",
+								"type": "DatasetReference",
+								"parameters": {
+									"path": "municipality_codes",
+									"filename": "municipality_codes.json"
+								}
+							}
+						]
+					}
+				],
+				"policy": {
+					"elapsedTimeMetric": {}
+				},
+				"annotations": []
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/datasets/DS_HTTP_Excel_municipality')]",
 				"[concat(variables('factoryId'), '/datasets/ds_adls_flatfiles')]"
 			]
 		},
@@ -981,13 +1097,15 @@
 						"userProperties": [],
 						"typeProperties": {
 							"source": {
-								"type": "JsonSource",
+								"type": "XmlSource",
 								"storeSettings": {
 									"type": "HttpReadSettings",
 									"requestMethod": "GET"
 								},
 								"formatSettings": {
-									"type": "JsonReadSettings"
+									"type": "XmlReadSettings",
+									"validationMode": "none",
+									"namespaces": true
 								}
 							},
 							"sink": {
@@ -1003,10 +1121,10 @@
 						},
 						"inputs": [
 							{
-								"referenceName": "ds_http_flatfiles",
+								"referenceName": "ds_http_xml_flatfiles",
 								"type": "DatasetReference",
 								"parameters": {
-									"url_data": "/contenidos/ds_recursos_turisticos/espacios_naturales_euskadi/opendata/espacios-naturales.json"
+									"url_data": "/contenidos/ds_recursos_turisticos/espacios_naturales_euskadi/opendata/espacios-naturales.xml"
 								}
 							}
 						],
@@ -1028,245 +1146,8 @@
 				"annotations": []
 			},
 			"dependsOn": [
-				"[concat(variables('factoryId'), '/datasets/ds_http_flatfiles')]",
+				"[concat(variables('factoryId'), '/datasets/ds_http_xml_flatfiles')]",
 				"[concat(variables('factoryId'), '/datasets/ds_adls_flatfiles')]"
-			]
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/pl_ingestion_one_time_load_restaurants')]",
-			"type": "Microsoft.DataFactory/factories/pipelines",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"activities": [
-					{
-						"name": "Copy data1",
-						"type": "Copy",
-						"dependsOn": [],
-						"policy": {
-							"timeout": "0.12:00:00",
-							"retry": 0,
-							"retryIntervalInSeconds": 30,
-							"secureOutput": false,
-							"secureInput": false
-						},
-						"userProperties": [],
-						"typeProperties": {
-							"source": {
-								"type": "JsonSource",
-								"storeSettings": {
-									"type": "HttpReadSettings",
-									"requestMethod": "GET"
-								},
-								"formatSettings": {
-									"type": "JsonReadSettings"
-								}
-							},
-							"sink": {
-								"type": "JsonSink",
-								"storeSettings": {
-									"type": "AzureBlobFSWriteSettings"
-								},
-								"formatSettings": {
-									"type": "JsonWriteSettings"
-								}
-							},
-							"enableStaging": false
-						},
-						"inputs": [
-							{
-								"referenceName": "ds_http_flatfiles",
-								"type": "DatasetReference",
-								"parameters": {
-									"url_data": "/contenidos/ds_recursos_turisticos/restaurantes_sidrerias_bodegas/opendata/restaurantes.json"
-								}
-							}
-						],
-						"outputs": [
-							{
-								"referenceName": "ds_adls_flatfiles",
-								"type": "DatasetReference",
-								"parameters": {
-									"path": "restaurants",
-									"filename": "restaurants.json"
-								}
-							}
-						]
-					}
-				],
-				"policy": {
-					"elapsedTimeMetric": {}
-				},
-				"annotations": []
-			},
-			"dependsOn": [
-				"[concat(variables('factoryId'), '/datasets/ds_http_flatfiles')]",
-				"[concat(variables('factoryId'), '/datasets/ds_adls_flatfiles')]"
-			]
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/pl_ingestion_one_time_load_weather_station')]",
-			"type": "Microsoft.DataFactory/factories/pipelines",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"activities": [
-					{
-						"name": "Copy data1",
-						"type": "Copy",
-						"dependsOn": [],
-						"policy": {
-							"timeout": "0.12:00:00",
-							"retry": 0,
-							"retryIntervalInSeconds": 30,
-							"secureOutput": false,
-							"secureInput": false
-						},
-						"userProperties": [],
-						"typeProperties": {
-							"source": {
-								"type": "JsonSource",
-								"storeSettings": {
-									"type": "HttpReadSettings",
-									"requestMethod": "GET"
-								},
-								"formatSettings": {
-									"type": "JsonReadSettings"
-								}
-							},
-							"sink": {
-								"type": "JsonSink",
-								"storeSettings": {
-									"type": "AzureBlobFSWriteSettings"
-								},
-								"formatSettings": {
-									"type": "JsonWriteSettings"
-								}
-							},
-							"enableStaging": false
-						},
-						"inputs": [
-							{
-								"referenceName": "ds_http_flatfiles",
-								"type": "DatasetReference",
-								"parameters": {
-									"url_data": "/contenidos/ds_meteorologicos/estaciones_meteorologicas/opendata/estaciones.json"
-								}
-							}
-						],
-						"outputs": [
-							{
-								"referenceName": "ds_adls_flatfiles",
-								"type": "DatasetReference",
-								"parameters": {
-									"path": "weather/stations",
-									"filename": "weather_stations.json"
-								}
-							}
-						]
-					}
-				],
-				"policy": {
-					"elapsedTimeMetric": {}
-				},
-				"annotations": []
-			},
-			"dependsOn": [
-				"[concat(variables('factoryId'), '/datasets/ds_http_flatfiles')]",
-				"[concat(variables('factoryId'), '/datasets/ds_adls_flatfiles')]"
-			]
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/pl_ingestion_daily_api_cultural_events')]",
-			"type": "Microsoft.DataFactory/factories/pipelines",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"activities": [
-					{
-						"name": "ForEach month",
-						"type": "ForEach",
-						"dependsOn": [],
-						"userProperties": [],
-						"typeProperties": {
-							"items": {
-								"value": "@variables('array_month')",
-								"type": "Expression"
-							},
-							"isSequential": true,
-							"activities": [
-								{
-									"name": "Web_getMetadata",
-									"type": "WebActivity",
-									"dependsOn": [],
-									"policy": {
-										"timeout": "0.12:00:00",
-										"retry": 0,
-										"retryIntervalInSeconds": 30,
-										"secureOutput": false,
-										"secureInput": false
-									},
-									"userProperties": [],
-									"typeProperties": {
-										"method": "GET",
-										"headers": {},
-										"url": {
-											"value": "@concat('https://api.euskadi.eus/culture/events/v1.0/events/byMonth/', formatDateTime(addToTime(utcNow(), int(item()), 'Month'), 'yyyy/M'), '?_elements=500&_page=1')",
-											"type": "Expression"
-										}
-									}
-								},
-								{
-									"name": "Execute Paging Pipeline",
-									"type": "ExecutePipeline",
-									"dependsOn": [
-										{
-											"activity": "Web_getMetadata",
-											"dependencyConditions": [
-												"Succeeded"
-											]
-										}
-									],
-									"policy": {
-										"secureInput": false
-									},
-									"userProperties": [],
-									"typeProperties": {
-										"pipeline": {
-											"referenceName": "pl_api_paging",
-											"type": "PipelineReference"
-										},
-										"waitOnCompletion": true,
-										"parameters": {
-											"year_month": {
-												"value": "@formatDateTime(addToTime(utcNow(), int(item()), 'Month'), 'yyyy/M')",
-												"type": "Expression"
-											},
-											"total_pages": {
-												"value": "@int(activity('Web_getMetadata').output.totalPages)",
-												"type": "Expression"
-											}
-										}
-									}
-								}
-							]
-						}
-					}
-				],
-				"policy": {
-					"elapsedTimeMetric": {}
-				},
-				"variables": {
-					"array_month": {
-						"type": "Array",
-						"defaultValue": [
-							0,
-							1,
-							2
-						]
-					}
-				},
-				"annotations": []
-			},
-			"dependsOn": [
-				"[concat(variables('factoryId'), '/pipelines/pl_api_paging')]"
 			]
 		}
 	]
