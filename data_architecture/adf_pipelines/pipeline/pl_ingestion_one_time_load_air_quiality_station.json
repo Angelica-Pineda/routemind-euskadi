@@ -50,7 +50,10 @@
 						"type": "DatasetReference",
 						"parameters": {
 							"path": "weather/air_quality/stations",
-							"filename": "air_quality_stations.json"
+							"filename": {
+								"value": "@concat('air_quality_stations_', formatDateTime(utcNow(), 'yyyy_MM_dd'), '.json')",
+								"type": "Expression"
+							}
 						}
 					}
 				]
