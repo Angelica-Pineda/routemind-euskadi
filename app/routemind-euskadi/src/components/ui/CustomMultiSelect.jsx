@@ -53,7 +53,7 @@ export function CustomMultiSelect({ value, onChange, options, label, onClose, di
   return (
     <div className={`grid gap-2 transition-all duration-500 ${disabled ? 'pointer-events-none opacity-40 grayscale' : 'opacity-100'}`}>
       <span className="text-sm font-medium text-zinc-300">{label}</span>
-      <Popover className="relative mt-1">
+      <Popover className="relative z-50 mt-1">
         {({ open }) => (
           <>
             <Popover.Button
@@ -87,7 +87,7 @@ export function CustomMultiSelect({ value, onChange, options, label, onClose, di
               leaveFrom="opacity-100 translate-y-0"
               leaveTo="opacity-0 translate-y-1"
             >
-              <Popover.Panel className="absolute z-50 mt-2 flex max-h-[26rem] w-full flex-col overflow-hidden rounded-2xl border border-white/10 bg-zinc-900 py-0 shadow-[0_20px_60px_rgba(0,0,0,0.9)] focus:outline-none">
+              <Popover.Panel className="absolute z-[100] mt-2 flex max-h-[24rem] w-full flex-col overflow-hidden rounded-2xl border border-white/10 bg-zinc-900 py-0 shadow-[0_20px_60px_rgba(0,0,0,0.9)] focus:outline-none">
                 {({ close }) => (
                   <>
                     <div className="sticky top-0 z-10 border-b border-white/10 bg-zinc-900/95 px-3 py-2 backdrop-blur-xl">

@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { siteOptions, zoneOptions } from '../shared/catalog.js'
 import { requestApiHealth, requestItinerary } from './lib/plannerClient.js'
 import { Footer, EuskadiFlag } from './components/layout/Footer'
@@ -41,6 +41,7 @@ function App() {
   const [status, setStatus] = useState('idle')
   const [error, setError] = useState('')
   const [health, setHealth] = useState({ state: 'checking', label: 'Comprobando API interna' })
+  const resultRef = useRef(null)
   const selectedZone = useMemo(() => zoneOptions.find((zone) => zone.id === form.zone) ?? zoneOptions[0], [form.zone])
   const selectedZoneSites = useMemo(() => siteOptions.filter((site) => selectedZone?.siteIds?.includes(site.id)), [selectedZone])
   const tripDurationDays = useMemo(() => getDateSpan(form.dateRange?.startDate, form.dateRange?.endDate), [form.dateRange])
@@ -63,6 +64,31 @@ function App() {
     })
   }, [result])
 
+  useEffect(() => {
+    const root = document.documentElement
+    const body = document.body
+
+    if (status === 'loading') {
+      root.classList.add('is-generating')
+      body.classList.add('is-generating')
+      return () => {
+        root.classList.remove('is-generating')
+        body.classList.remove('is-generating')
+      }
+    }
+
+    root.classList.remove('is-generating')
+    body.classList.remove('is-generating')
+  }, [status])
+
+  useEffect(() => {
+    if (status !== 'success' || !result || !resultRef.current) return
+
+    requestAnimationFrame(() => {
+      resultRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+    })
+  }, [status, result])
+
   function updateField(field, value) { setForm((current) => ({ ...current, [field]: value })) }
   function handleZoneSelect(zoneId) { const zone = zoneOptions.find((item) => item.id === zoneId); setForm((current) => ({ ...current, zone: zoneId, sites: zone?.siteIds?.length ? zone.siteIds.slice(0, 3) : current.sites })) }
   function toggleSite(siteId) { setForm((current) => { const alreadySelected = current.sites.includes(siteId); if (alreadySelected) return { ...current, sites: current.sites.filter((item) => item !== siteId) }; if (current.sites.length >= 3) return current; return { ...current, sites: [...current.sites, siteId] } }) }
@@ -82,7 +108,7 @@ function App() {
       <PlannerForm form={form} health={health} status={status} error={error} tripDurationDays={tripDurationDays} activeStep={activeStep} selectedZone={selectedZone} selectedZoneSites={selectedZoneSites} defaultStartDate={defaultStartDate} maxDate={maxDate} onSubmit={handleSubmit} updateField={updateField} toggleSite={toggleSite} />
       <MongoPromptPreview result={result} />
       <AiStatusNotice result={result} />
-      <ItineraryResult result={result} status={status} selectedZone={selectedZone} />
+      <ItineraryResult result={result} status={status} selectedZone={selectedZone} resultRef={resultRef} />
     </section></main>
     <Footer />
   </div>

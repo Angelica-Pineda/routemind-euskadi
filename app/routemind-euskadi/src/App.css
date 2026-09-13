@@ -138,3 +138,10 @@ html, body {
   overflow-y: auto !important;
   padding-right: 0 !important; /* Evita saltos por la barra de scroll */
 }
+
+html.is-generating,
+body.is-generating {
+  overflow: hidden !important;
+  overscroll-behavior: none;
+  touch-action: none;
+}

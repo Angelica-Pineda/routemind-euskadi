@@ -144,9 +144,8 @@ function buildGeminiPrompt(request, catalog, selectedZone, rankings) {
     },
   }
 
-  return `Eres un planificador turístico experto en Euskadi. Genera un itinerario usando únicamente los lugares, eventos y clima proporcionados.
-
-PREFERENCIAS DE USUARIO DEL VIAJE:
+  return `Eres un planificador turístico experto en Euskadi. Genera un itinerario usando únicamente los lugares, eventos y clima proporcionados. Ten en cuenta las preferencias del usuario especialmente el ritmo del itinerario (propiedad "pace" valores posibles: relajado, equilibrado, intenso) para determinar la mejor distribución de actividades.
+PREFERENCIAS DE USUARIO.:
 ${JSON.stringify(input, null, 2)}
 
 DATOS FILTRADOS A TENER EN CUENTA:
@@ -158,9 +157,10 @@ ${JSON.stringify(rankings, null, 2)}
 REGLAS OBLIGATORIAS:
 1. Respeta las fechas, planes, transporte, ritmo, presupuesto y número de personas.
 2. No inventes lugares, eventos, fechas ni datos meteorológicos.
-3. Usa null cuando un bloque del día no tenga una actividad adecuada.
-4. Responde únicamente con JSON válido, sin Markdown, sin comentarios y sin texto adicional.
-5. Mantén exactamente las claves, tipos y estructura de este esquema. No añadas, elimines ni renombres propiedades:
+3. Ten en cuenta la propiedad "selectedSites" de las preferencias del usuario para priorizar la inclusión de esos sitios en el itinerario incluso si no están dentro de los datos filtrados.
+4. Usa null cuando un bloque del día no tenga una actividad adecuada.
+5. Responde únicamente con JSON válido, sin Markdown, sin comentarios y sin texto adicional.
+6. Mantén exactamente las claves, tipos y estructura de este esquema. No añadas, elimines ni renombres propiedades:
 ${JSON.stringify(responseSchema, null, 2)}
 
 Cada actividad debe tener esta estructura cuando no sea null: {"title":"string","place":"string","reason":"string","setting":"string"}.`
