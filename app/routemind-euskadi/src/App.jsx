@@ -130,7 +130,7 @@ function App() {
     <main id="mapa-zonas" className="relative z-10 mx-auto flex w-full max-w-7xl flex-col gap-10 px-4 py-16 sm:px-6 lg:gap-14 lg:px-8 lg:py-24"><section className="space-y-8">
       <ZoneMapPreview selectedZone={selectedZone} onSelectZone={handleZoneSelect} />
       <PlannerForm form={form} health={health} status={status} error={error} tripDurationDays={tripDurationDays} activeStep={activeStep} selectedZone={selectedZone} selectedZoneSites={selectedZoneSites} defaultStartDate={defaultStartDate} maxDate={maxDate} onSubmit={handleSubmit} updateField={updateField} toggleSite={toggleSite} />
-      <MongoPromptPreview result={result} />
+      {/* <MongoPromptPreview result={result} /> */}
       <AiStatusNotice result={result} />
       <ItineraryResult result={result} status={status} selectedZone={selectedZone} resultRef={resultRef} />
     </section></main>
