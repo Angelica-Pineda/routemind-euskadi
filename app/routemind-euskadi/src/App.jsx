@@ -21,10 +21,16 @@ const heroCards = [
 ]
 
 const initialFormState = {
-  dateRange: { startDate: null, endDate: null }, zone: 'bilbao-metro', transport: '', pace: '', budget: '', partySize: '', plans: [], sites: ['guggenheim-bilbao', 'casco-viejo-bilbao'],
+  dateRange: { startDate: null, endDate: null }, arrivalTime: '11:00', departureTime: '17:00', zone: 'bilbao-metro', transport: '', pace: '', budget: '', partySize: '', plans: [], sites: ['guggenheim-bilbao', 'casco-viejo-bilbao'],
 }
 
-function formatDateInput(date) { return date.toISOString().slice(0, 10) }
+function formatDateInput(date) { return [date.getFullYear(), String(date.getMonth() + 1).padStart(2, '0'), String(date.getDate()).padStart(2, '0')].join('-') }
+function getCalendarDate(value) {
+  if (!value) return null
+  if (typeof value === 'string') return value.slice(0, 10)
+  const date = new Date(value)
+  return Number.isNaN(date.getTime()) ? null : [date.getFullYear(), String(date.getMonth() + 1).padStart(2, '0'), String(date.getDate()).padStart(2, '0')].join('-')
+}
 function addMonths(date, months) { const clone = new Date(date); clone.setMonth(clone.getMonth() + months); return clone }
 function getDateSpan(startDate, endDate) {
   if (!startDate || !endDate) return 0
@@ -97,7 +103,14 @@ function App() {
   async function handleSubmit(event) {
     event.preventDefault(); setStatus('loading'); setError(''); setValidationMessage('')
     console.info('[Gemini] Iniciando generación. Orden de modelos: gemini-3.8-flash -> gemini-3.7-flash -> gemini-3.6-flash -> gemini-3.5-flash -> gemini-3-flash-preview -> gemini-2.5-flash')
-    try { const payload = await requestItinerary({ ...form, startDate: form.dateRange.startDate, endDate: form.dateRange.endDate }); setResult(payload); setStatus('success') }
+    try {
+      const payload = await requestItinerary({
+        ...form,
+        startDate: `${getCalendarDate(form.dateRange.startDate)}T${form.arrivalTime}:00`,
+        endDate: `${getCalendarDate(form.dateRange.endDate)}T${form.departureTime}:00`,
+      })
+      setResult(payload); setStatus('success')
+    }
     catch (requestError) {
       setStatus('error')
       if (requestError.details?.length) {

@@ -1,6 +1,11 @@
 import Datepicker from "react-tailwindcss-datepicker";
 
 export function CustomDatePicker({ value, onChange, label, minDate, maxDate, disabled, isNext }) {
+  const parseLocalDate = (dateValue) => {
+    if (!dateValue) return undefined;
+    const [year, month, day] = String(dateValue).slice(0, 10).split('-').map(Number);
+    return new Date(year, month - 1, day);
+  };
   
   // Garantiza que la librería siempre tenga la estructura que espera
   const safeValue = value?.startDate ? value : { startDate: null, endDate: null };
@@ -15,8 +20,8 @@ export function CustomDatePicker({ value, onChange, label, minDate, maxDate, dis
           useRange={true}
           value={safeValue} 
           onChange={onChange}
-          minDate={new Date(minDate)}
-          maxDate={new Date(maxDate)}
+          minDate={parseLocalDate(minDate)}
+          maxDate={parseLocalDate(maxDate)}
           displayFormat={"DD/MM/YYYY"}
           startWeekOn="mon"
           i18n={"es"}

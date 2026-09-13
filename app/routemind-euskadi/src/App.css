@@ -146,8 +146,3 @@ body.is-generating {
   touch-action: none;
 }
 
-/* El itinerario debe crecer con el documento, no crear un segundo scroll. */
-.max-h-\[45rem\] {
-  max-height: none !important;
-  overflow-y: visible !important;
-}

@@ -25,6 +25,12 @@ function normalizeTerritoryCodes(value) {
   return String(value ?? '').match(/01|20|48/g) ?? []
 }
 
+function calendarBoundary(value, endOfDay = false) {
+  const date = new Date(value)
+  if (Number.isNaN(date.getTime())) return date
+  return new Date(date.getFullYear(), date.getMonth(), date.getDate(), endOfDay ? 23 : 0, endOfDay ? 59 : 0, endOfDay ? 59 : 0, endOfDay ? 999 : 0)
+}
+
 let cachedClientPromise = null
 
 function normalizePlace(document) {
@@ -122,7 +128,7 @@ export async function fetchCatalogSnapshot(request = {}) {
     const territoryCodeRegex = buildTerritoryCodeRegex(selectedTerritoryCodes)
     const placeTerritoryFilter = { territorycode: { $regex: territoryCodeRegex } }
     const eventTerritoryFilter = { countyId: { $in: selectedTerritoryCodes } }
-    const weatherFilter = { date: { $gte: startDate, $lte: endDate }, countyId: { $in: selectedTerritoryCodes } }
+    const weatherFilter = { date: { $gte: calendarBoundary(startDate), $lte: calendarBoundary(endDate, true) }, countyId: { $in: selectedTerritoryCodes } }
 
     const [places, events, weather] = await Promise.all([
       db.collection('visit_points_user_category').find({ ...categoryFilter, ...placeTerritoryFilter }).limit(100).toArray(),
