@@ -9,6 +9,7 @@ import { PlannerForm } from './components/planner/PlannerForm'
 import { MongoPromptPreview } from './components/planner/MongoPromptPreview'
 import { AiStatusNotice } from './components/planner/AiStatusNotice'
 import { GeminiLoader } from './components/planner/GeminiLoader'
+import { TripValidationModal } from './components/planner/TripValidationModal'
 import { ItineraryResult } from './components/itinerary/ItineraryResult'
 import './App.css'
 import 'leaflet/dist/leaflet.css'
@@ -40,6 +41,7 @@ function App() {
   const [result, setResult] = useState(null)
   const [status, setStatus] = useState('idle')
   const [error, setError] = useState('')
+  const [validationMessage, setValidationMessage] = useState('')
   const [health, setHealth] = useState({ state: 'checking', label: 'Comprobando API interna' })
   const resultRef = useRef(null)
   const selectedZone = useMemo(() => zoneOptions.find((zone) => zone.id === form.zone) ?? zoneOptions[0], [form.zone])
@@ -93,13 +95,22 @@ function App() {
   function handleZoneSelect(zoneId) { const zone = zoneOptions.find((item) => item.id === zoneId); setForm((current) => ({ ...current, zone: zoneId, sites: zone?.siteIds?.length ? zone.siteIds.slice(0, 3) : current.sites })) }
   function toggleSite(siteId) { setForm((current) => { const alreadySelected = current.sites.includes(siteId); if (alreadySelected) return { ...current, sites: current.sites.filter((item) => item !== siteId) }; if (current.sites.length >= 3) return current; return { ...current, sites: [...current.sites, siteId] } }) }
   async function handleSubmit(event) {
-    event.preventDefault(); setStatus('loading'); setError('')
+    event.preventDefault(); setStatus('loading'); setError(''); setValidationMessage('')
     console.info('[Gemini] Iniciando generación. Orden de modelos: gemini-3.8-flash -> gemini-3.7-flash -> gemini-3.6-flash -> gemini-3.5-flash -> gemini-3-flash-preview -> gemini-2.5-flash')
     try { const payload = await requestItinerary({ ...form, startDate: form.dateRange.startDate, endDate: form.dateRange.endDate }); setResult(payload); setStatus('success') }
-    catch (requestError) { setStatus('error'); setError(requestError.message || 'No se pudo generar el itinerario.') }
+    catch (requestError) {
+      setStatus('error')
+      if (requestError.details?.length) {
+        setValidationMessage(requestError.details[0])
+        setError('Revisa las condiciones del viaje para poder generar un itinerario realista.')
+      } else {
+        setError(requestError.message || 'No se pudo generar el itinerario.')
+      }
+    }
   }
 
   return <div className="relative min-h-screen bg-zinc-950 font-sans text-zinc-100 selection:bg-orange-500/30 selection:text-orange-100">
+    <TripValidationModal message={validationMessage} onClose={() => setValidationMessage('')} />
     {status === 'loading' ? <GeminiLoader /> : null}
     <HeroSection heroCards={heroCards} EuskadiFlag={EuskadiFlag} />
     <HowItWorksSection />

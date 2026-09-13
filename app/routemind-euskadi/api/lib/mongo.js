@@ -38,13 +38,11 @@ function normalizePlace(document) {
     territoryCodes,
     setting: String(document.templateType ?? document.category ?? 'indiferente'),
     tags: [document.marks, document.templateType, document.category].filter(Boolean).map(String),
-    transport: [],
-    durationHours: 2,
+    // durationHours: 2,
     priority: 75,
     description: String(document.marks ?? document.templateType ?? 'Punto de interés turístico.'),
     coordinates: document.latwgs84 && document.lonwgs84 ? [Number(document.latwgs84), Number(document.lonwgs84)] : null,
     userCategory: String(document.user_category ?? ''),
-    source: 'mongo',
   }
 }
 
@@ -59,15 +57,13 @@ function normalizeEvent(document) {
     territoryCodes,
     setting: String(document.type_name ?? 'evento'),
     tags: [document.type_name, document.user_category].filter(Boolean).map(String),
-    transport: [],
-    durationHours: 2,
+    // durationHours: 2,
     priority: 80,
-    description: String(document.opening_hour ?? 'Evento cultural disponible en las fechas seleccionadas.'),
+    openingHour: String(document.opening_hour ?? 'Evento cultural disponible en las fechas seleccionadas.'),
     coordinates: document.location ?? null,
     userCategory: String(document.user_category ?? ''),
     startDate: document.startDate ?? null,
     endDate: document.endDate ?? null,
-    source: 'mongo',
   }
 }
 

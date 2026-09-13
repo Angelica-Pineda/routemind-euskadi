@@ -3,6 +3,16 @@ import { fetchCatalogSnapshot } from './mongo.js'
 import { generateItineraryWithGemini } from './gemini.js'
 
 const MAX_PLAN_MONTHS = 3
+const MIN_TRIP_DAYS = 1
+const MAX_TRIP_DAYS = 14
+const MAX_EUSKADI_TRIP_DAYS = 21
+const MAX_SELECTED_PLANS = 6
+
+const DAILY_ACTIVITY_LIMITS = {
+  relajado: { min: 1, max: 2 },
+  equilibrado: { min: 2, max: 3 },
+  intenso: { min: 3, max: 4 },
+}
 
 const TERRITORY_CODES = {
   Araba: '01',
@@ -80,7 +90,20 @@ function getItemTerritoryCodes(item) {
   return code ? [code] : []
 }
 
+function getTripDurationDays(startDate, endDate) {
+  if (!startDate || !endDate) {
+    return 0
+  }
+
+  return Math.round((endDate - startDate) / (1000 * 60 * 60 * 24)) + 1
+}
+
+function getDailyActivityLimits(pace) {
+  return DAILY_ACTIVITY_LIMITS[pace] ?? DAILY_ACTIVITY_LIMITS.equilibrado
+}
+
 function buildGeminiPrompt(request, catalog, selectedZone, rankings) {
+  const dailyActivityLimits = getDailyActivityLimits(request.pace)
   const input = {
     dates: { start: request.startDate, end: request.endDate },
     preferences: {
@@ -92,6 +115,7 @@ function buildGeminiPrompt(request, catalog, selectedZone, rankings) {
     },
     zone: selectedZone?.label,
     selectedSites: request.sites,
+    dailyActivityLimits,
   }
 
   const places = catalog.places.map((place) => ({
@@ -156,11 +180,12 @@ ${JSON.stringify(rankings, null, 2)}
 
 REGLAS OBLIGATORIAS:
 1. Respeta las fechas, planes, transporte, ritmo, presupuesto y número de personas.
-2. No inventes lugares, eventos, fechas ni datos meteorológicos.
-3. Ten en cuenta la propiedad "selectedSites" de las preferencias del usuario para priorizar la inclusión de esos sitios en el itinerario incluso si no están dentro de los datos filtrados.
-4. Usa null cuando un bloque del día no tenga una actividad adecuada.
-5. Responde únicamente con JSON válido, sin Markdown, sin comentarios y sin texto adicional.
-6. Mantén exactamente las claves, tipos y estructura de este esquema. No añadas, elimines ni renombres propiedades:
+2. Respeta exactamente dailyActivityLimits: relajado permite 1-2 actividades principales por día, equilibrado 2-3 e intenso 3-4. Los bloques sin actividad deben ser null.
+3. No inventes lugares, eventos, fechas ni datos meteorológicos.
+4. Ten en cuenta la propiedad "selectedSites" de las preferencias del usuario para priorizar la inclusión de esos sitios en el itinerario incluso si no están dentro de los datos filtrados.
+5. Usa null cuando un bloque del día no tenga una actividad adecuada.
+6. Responde únicamente con JSON válido, sin Markdown, sin comentarios y sin texto adicional.
+7. Mantén exactamente las claves, tipos y estructura de este esquema. No añadas, elimines ni renombres propiedades:
 ${JSON.stringify(responseSchema, null, 2)}
 
 Cada actividad debe tener esta estructura cuando no sea null: {"title":"string","place":"string","reason":"string","setting":"string"}.`
@@ -193,6 +218,9 @@ export function validateTripRequest(request) {
   const endDate = toDate(request.endDate)
   const today = startOfDay(new Date())
   const maxDate = addMonths(today, MAX_PLAN_MONTHS)
+  const tripDurationDays = getTripDurationDays(startDate, endDate)
+  const isWholeEuskadi = request.zone === 'euskadi-general'
+  const maxAllowedDays = isWholeEuskadi ? MAX_EUSKADI_TRIP_DAYS : MAX_TRIP_DAYS
 
   if (!startDate) {
     errors.push('La fecha de inicio es obligatoria.')
@@ -212,6 +240,25 @@ export function validateTripRequest(request) {
 
   if (startDate && endDate && endDate < startDate) {
     errors.push('La fecha de fin debe ser posterior o igual a la fecha de inicio.')
+  }
+
+  if (startDate && endDate && tripDurationDays < MIN_TRIP_DAYS) {
+    errors.push('El itinerario debe durar al menos 1 día.')
+  }
+
+  if (startDate && endDate && tripDurationDays > maxAllowedDays) {
+    errors.push(isWholeEuskadi
+      ? 'Un itinerario para Todo Euskadi no puede superar los 21 días.'
+      : 'Un itinerario para una zona concreta no puede superar los 14 días. Para viajes más largos selecciona Todo Euskadi.')
+  }
+
+  const maxPlans = tripDurationDays === 1 ? 2 : tripDurationDays <= 3 ? 4 : 6
+  if (request.plans.length > maxPlans) {
+    errors.push(`Para un viaje de ${tripDurationDays} día${tripDurationDays === 1 ? '' : 's'} puedes seleccionar como máximo ${maxPlans} categorías.`)
+  }
+
+  if (request.plans.length > MAX_SELECTED_PLANS) {
+    errors.push(`No se pueden seleccionar más de ${MAX_SELECTED_PLANS} categorías.`)
   }
 
   if (request.sites.length > 3) {

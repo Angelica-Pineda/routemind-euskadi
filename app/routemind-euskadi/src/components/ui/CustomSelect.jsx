@@ -26,7 +26,8 @@ export function CustomSelect({ value, onChange, options, label, disabled, isNext
       <span className="text-sm font-medium text-zinc-300">{label}</span>
       
       <Listbox value={value} onChange={onChange} disabled={disabled}>
-        <div className="relative mt-1">
+        {({ open }) => (
+        <div className={`relative mt-1 ${open ? 'z-50' : 'z-0'}`}>
           <Listbox.Button 
             ref={buttonRef}
             className={`relative w-full cursor-pointer rounded-2xl border px-4 py-3 text-left text-zinc-100 shadow-sm transition-all duration-300 focus:outline-none ${isNext ? 'border-orange-500/80 bg-orange-500/10 shadow-[0_0_15px_rgba(249,115,22,0.2)] ring-1 ring-orange-500/50' : 'border-white/10 bg-white/5 hover:border-orange-500/40 hover:bg-white/10'}`}
@@ -73,6 +74,7 @@ export function CustomSelect({ value, onChange, options, label, disabled, isNext
             </Listbox.Options>
           </Transition>
         </div>
+        )}
       </Listbox>
     </div>
   )
