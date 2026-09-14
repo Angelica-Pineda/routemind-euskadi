@@ -18,7 +18,7 @@ export function ItineraryResult({ result, status, selectedZone, resultRef }) {
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, margin: "-100px" }}
       transition={{ duration: 0.7, ease: "easeOut" }}
-      className="relative z-0 rounded-[2rem] border border-white/5 bg-white/[0.02] p-6 shadow-2xl backdrop-blur-xl sm:p-8"
+      className="relative z-0 rounded-[2rem] border border-white/5 bg-white/[0.02] p-4 shadow-2xl backdrop-blur-xl sm:p-8"
     >
       <div className="flex items-center justify-between gap-3">
         <div>

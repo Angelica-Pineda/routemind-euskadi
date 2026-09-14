@@ -17,7 +17,7 @@ function formatDisplayDate(value) {
 
 export function DayCard({ day, index }) {
   return (
-    <div className="rounded-3xl border border-white/10 bg-zinc-950/60 p-5 shadow-[0_16px_48px_rgba(9,9,11,0.5)]">
+    <div className="rounded-3xl border border-white/10 bg-zinc-950/60 p-4 lg:p-5 shadow-[0_16px_48px_rgba(9,9,11,0.5)]">
       <div className="flex flex-wrap items-center gap-3">
         <div>
           <p className="text-xs uppercase tracking-[0.3em] text-orange-400/80">
@@ -38,7 +38,7 @@ export function DayCard({ day, index }) {
         ].map(([label, block]) => (
           <div
             key={label}
-            className="rounded-2xl border border-white/5 bg-white/[0.03] p-4"
+            className="rounded-2xl border border-white/5 bg-white/[0.03] p-3 lg:p-4"
           >
             <p className="text-xs uppercase tracking-[0.25em] text-zinc-400">
               {label}
@@ -46,12 +46,14 @@ export function DayCard({ day, index }) {
             {block ? (
               <>
                 <h5 className="mt-2 text-sm font-semibold text-white">
+                  {/* {block.place} */}
                   {block.title}
                 </h5>
                 <p className="mt-2 text-xs leading-5 text-zinc-300">
                   {block.reason}
                 </p>
                 <div className="mt-3 flex flex-wrap gap-2 text-[11px] text-zinc-400">
+                  {/* {block.title ? <span>{block.title}</span> : null} */}
                   {block.place ? <span>{block.place}</span> : null}
                   {block.setting ? <span>{block.setting}</span> : null}
                 </div>
