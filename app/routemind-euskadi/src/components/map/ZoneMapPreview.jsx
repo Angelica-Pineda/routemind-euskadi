@@ -42,6 +42,11 @@ function ZoneMarker({ zone, active, onSelect }) {
 }
 export function ZoneMapPreview({ selectedZone, onSelectZone }) {
   const mapCenter = selectedZone?.center ?? zoneOptions[0].center;
+  const orderedZones = [
+    ...zoneOptions.filter((zone) => zone.id === "bilbao-metro"),
+    ...zoneOptions.filter((zone) => zone.id !== "bilbao-metro" && zone.id !== "euskadi-general"),
+    ...zoneOptions.filter((zone) => zone.id === "euskadi-general"),
+  ];
   return (
     <div className="overflow-hidden rounded-[2rem] border border-white/10 bg-zinc-950/70 shadow-[0_24px_100px_rgba(9,9,11,0.5)] backdrop-blur-md">
       <div className="flex flex-wrap items-center justify-between gap-3 border-b border-white/10 px-5 py-4">
@@ -58,7 +63,7 @@ export function ZoneMapPreview({ selectedZone, onSelectZone }) {
           {selectedZone?.label}
         </div>
       </div>
-      <div className="grid gap-0 lg:grid-cols-[minmax(0,1fr)_24rem] lg:gap-4">
+      <div className="grid gap-0 lg:grid-cols-[minmax(0,1fr)_24rem]">
         <div className="map-shell map-preview-map h-[34rem] min-h-[28rem] lg:h-[40rem] lg:rounded-[1.6rem]">
           <MapContainer
             center={mapCenter}
@@ -80,9 +85,9 @@ export function ZoneMapPreview({ selectedZone, onSelectZone }) {
             ))}
           </MapContainer>
         </div>
-        <aside className="map-preview-sidebar border-t border-white/10 bg-zinc-950/92 p-4 backdrop-blur-xl lg:sticky lg:top-4 lg:self-start lg:rounded-[1.6rem] lg:border lg:border-white/10 lg:p-5">
-          <div className="grid max-h-[26rem] gap-3 overflow-y-auto lg:max-h-[36rem] [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
-            {zoneOptions.map((zone) => (
+        <aside className="map-preview-sidebar border-t border-white/10 bg-zinc-950/92 p-4 backdrop-blur-xl lg:sticky lg:top-4 lg:self-start lg:border-l lg:border-t-0 lg:border-white/10 lg:bg-transparent">
+          <div className="grid max-h-[26rem] gap-3 overflow-y-auto lg:max-h-[38rem] [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
+            {orderedZones.map((zone) => (
               <button
                 key={zone.id}
                 type="button"
