@@ -66,7 +66,7 @@ export function ItineraryResult({ result, status, selectedZone, resultRef }) {
                 </p>
               </div>
             </div>
-            <div className="mt-8 grid gap-4 sm:grid-cols-3">
+            {/* <div className="mt-8 grid gap-4 sm:grid-cols-3">
               {[
                 [
                   "Zona",
@@ -85,7 +85,7 @@ export function ItineraryResult({ result, status, selectedZone, resultRef }) {
                   <p className="mt-2 font-medium text-white">{value}</p>
                 </div>
               ))}
-            </div>
+            </div> */}
             <div className="mt-8 space-y-5">
               {Array.isArray(result.itinerary?.days) &&
               result.itinerary.days.length ? (

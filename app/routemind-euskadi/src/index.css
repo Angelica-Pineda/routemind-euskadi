@@ -4,6 +4,8 @@
 /* @source "../node_modules/react-tailwindcss-datepicker/dist";
 @source "./node_modules/react-tailwindcss-datepicker/dist/index.esm.{js,ts}"; */
 
+@custom-variant dark (&:where(.dark, .dark *));
+
 /* :root {
   color-scheme: dark;
   font-family: 'Manrope', 'Segoe UI', system-ui, sans-serif;
