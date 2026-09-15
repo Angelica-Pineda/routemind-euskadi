@@ -1,10 +1,15 @@
 <!-- # 🗺️ RouteMind Euskadi -->
-# <img src="app/routemind-euskadi/public/Flag.svg" alt="Logo RouteMind" width="50" align="center" /> RouteMind Euskadi
+<!-- # <img src="app/routemind-euskadi/public/Flag.svg" alt="Logo RouteMind" width="50" align="center" /> RouteMind Euskadi -->
+<h1>
+  <img src="app/routemind-euskadi/public/Flag.svg" alt="Logo" width="50" height="50" style="vertical-align: middle;">
+  RouteMind Euskadi
+</h1>
 ![Status](https://img.shields.io/badge/Status-Completado-success?style=plastic)
 ![TFM](https://img.shields.io/badge/TFM-UCM-blue?style=plastic)
 ![React](https://img.shields.io/badge/Frontend-React-61DAFB?style=plastic&logo=react)
 ![Node](https://img.shields.io/badge/Backend-Node.js-339933?style=plastic&logo=Node.js)
 ![Python](https://img.shields.io/badge/ETL-Python-3776AB?style=plastic&logo=python)
+![Databricks](https://img.shields.io/badge/Databricks-181825?style=plastic&logo=databricks)
 ![MongoDB](https://img.shields.io/badge/Database-MongoDB-47A248?style=plastic&logo=mongodb)
 ![Google](https://img.shields.io/badge/Google-Gemini_IA-8E75B2?style=plastic&logo=google)
 ![License](https://img.shields.io/badge/License-MIT-green?style=plastic)
