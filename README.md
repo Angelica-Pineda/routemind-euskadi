@@ -4,6 +4,7 @@
   <img src="app/routemind-euskadi/public/Flag.svg" alt="Logo" width="50" height="50" style="vertical-align: middle;">
   RouteMind Euskadi
 </h1>
+
 ![Status](https://img.shields.io/badge/Status-Completado-success?style=plastic)
 ![TFM](https://img.shields.io/badge/TFM-UCM-blue?style=plastic)
 ![React](https://img.shields.io/badge/Frontend-React-61DAFB?style=plastic&logo=react)
