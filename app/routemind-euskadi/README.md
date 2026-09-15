@@ -1,6 +1,6 @@
-# RouteMind Euskadi
+# RouteMind Euskadi Frontend
 
-Aplicacion React + Vite preparada para desplegar en Vercel con backend interno en `api/`, consulta a MongoDB y generacion de itinerarios con Gemini.
+Aplicacion React + Vite con backend interno en `api/`, consulta a MongoDB y generacion de itinerarios con Gemini.
 
 ## Estructura
 
