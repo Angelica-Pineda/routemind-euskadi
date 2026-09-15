@@ -25,6 +25,20 @@ function normalizeTerritoryCodes(value) {
   return String(value ?? '').match(/01|20|48/g) ?? []
 }
 
+function normalizeSetting(...values) {
+  const text = values.filter(Boolean).map(String).join(' ').toLowerCase()
+
+  if (/(indoor|interior|museo|exposici|teatro|galer[ií]a|restauraci[oó]n|restaurante|bodega)/i.test(text)) {
+    return 'indoor'
+  }
+
+  if (/(outdoor|exterior|playa|costa|monta[nñ]a|naturaleza|senderismo|parque|mirador|deporte)/i.test(text)) {
+    return 'outdoor'
+  }
+
+  return 'mixed'
+}
+
 function calendarBoundary(value, endOfDay = false) {
   const date = new Date(value)
   if (Number.isNaN(date.getTime())) return date
@@ -42,7 +56,7 @@ function normalizePlace(document) {
     city: String(document.municipality ?? document.municipalitycode ?? ''),
     province: territoryCodes.join(' '),
     territoryCodes,
-    setting: String(document.templateType ?? document.category ?? 'indiferente'),
+    setting: normalizeSetting(document.templateType, document.category, document.marks),
     tags: [document.marks, document.templateType, document.category].filter(Boolean).map(String),
     // durationHours: 2,
     priority: 75,
@@ -61,7 +75,7 @@ function normalizeEvent(document) {
     city: String(document.municipality ?? ''),
     province: territoryCodes.join(' '),
     territoryCodes,
-    setting: String(document.type_name ?? 'evento'),
+    setting: normalizeSetting(document.type_name, document.user_category, document.location),
     tags: [document.type_name, document.user_category].filter(Boolean).map(String),
     // durationHours: 2,
     priority: 80,

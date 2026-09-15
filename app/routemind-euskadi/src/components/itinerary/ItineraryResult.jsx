@@ -9,7 +9,7 @@ import {
 } from "react-icons/ri";
 import { DayCard } from "./DayCard";
 
-export function ItineraryResult({ result, status, selectedZone, resultRef }) {
+export function ItineraryResult({ result, status, resultRef }) {
   return (
     <motion.section
       ref={resultRef}
@@ -153,12 +153,12 @@ export function ItineraryResult({ result, status, selectedZone, resultRef }) {
           <div className="grid gap-6">
             <div className="rounded-3xl border border-white/5 bg-white/[0.03] p-8">
               <p className="text-xs font-semibold uppercase tracking-[0.25em] text-orange-400">
-                CÃ³mo funciona
+                Cómo funciona
               </p>
               <div className="mt-6 space-y-6 text-sm text-zinc-300">
                 {[
-                  "Navega por el mapa de arriba y elige la zona que servirÃ¡ como centro base.",
-                  "Personaliza filtros, marca hasta tres sitios favoritos y aÃ±ade el contexto extra.",
+                  "Navega por el mapa de arriba y elige la zona que servirá como centro base.",
+                  "Personaliza filtros, marca hasta tres sitios favoritos y añade el contexto extra.",
                   <>
                     Pulsa{" "}
                     <span className="font-semibold text-orange-200">
@@ -183,10 +183,10 @@ export function ItineraryResult({ result, status, selectedZone, resultRef }) {
               </p>
               <div className="mt-4 flex flex-wrap gap-2 text-xs font-medium text-zinc-400">
                 <span className="rounded-full border border-white/10 bg-white/5 px-4 py-2">
-                  Prueba "Transporte público" vs "Coche"
+                  Prueba Transporte Público vs Coche Propio
                 </span>
                 <span className="rounded-full border border-white/10 bg-white/5 px-4 py-2">
-                  Viaje lento vs Acelerado
+                  Ritmo Relajado vs Ritmo Intenso
                 </span>
               </div>
             </div>

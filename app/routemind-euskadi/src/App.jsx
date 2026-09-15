@@ -131,7 +131,7 @@ function App() {
       <PlannerForm form={form} health={health} status={status} error={error} tripDurationDays={tripDurationDays} activeStep={activeStep} selectedZone={selectedZone} selectedZoneSites={selectedZoneSites} defaultStartDate={defaultStartDate} maxDate={maxDate} onSubmit={handleSubmit} updateField={updateField} toggleSite={toggleSite} />
       {/* <MongoPromptPreview result={result} /> */}
       <AiStatusNotice result={result} />
-      <ItineraryResult result={result} status={status} selectedZone={selectedZone} resultRef={resultRef} />
+      <ItineraryResult result={result} status={status} resultRef={resultRef} />
     </section></main>
     <Footer />
   </div>

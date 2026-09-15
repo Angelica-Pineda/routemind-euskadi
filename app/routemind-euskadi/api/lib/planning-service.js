@@ -103,6 +103,16 @@ function getDailyActivityLimits(pace) {
   return DAILY_ACTIVITY_LIMITS[pace] ?? DAILY_ACTIVITY_LIMITS.equilibrado
 }
 
+function normalizeSetting(value, fallback = 'mixed') {
+  const setting = String(value ?? '').toLowerCase()
+
+  if (setting === 'indoor' || setting === 'outdoor' || setting === 'mixed') {
+    return setting
+  }
+
+  return fallback
+}
+
 function buildGeminiPrompt(request, catalog, selectedZone, rankings) {
   const dailyActivityLimits = getDailyActivityLimits(request.pace)
   const input = {
@@ -151,10 +161,10 @@ function buildGeminiPrompt(request, catalog, selectedZone, rankings) {
       date: 'YYYY-MM-DD',
       label: 'string',
       theme: 'string',
-      morning: { title: 'string', place: 'string', reason: 'string', setting: 'string' },
-      midday: { title: 'string', place: 'string', reason: 'string', setting: 'string' },
-      afternoon: { title: 'string', place: 'string', reason: 'string', setting: 'string' },
-      evening: { title: 'string', place: 'string', reason: 'string', setting: 'string' },
+      morning: { title: 'string', place: 'string', reason: 'string', setting: 'indoor|outdoor|mixed' },
+      midday: { title: 'string', place: 'string', reason: 'string', setting: 'indoor|outdoor|mixed' },
+      afternoon: { title: 'string', place: 'string', reason: 'string', setting: 'indoor|outdoor|mixed' },
+      evening: { title: 'string', place: 'string', reason: 'string', setting: 'indoor|outdoor|mixed' },
       weatherNote: 'string',
       transportNote: 'string',
       notes: ['string'],
@@ -185,8 +195,7 @@ REGLAS OBLIGATORIAS:
 3. No inventes lugares, eventos, fechas ni datos meteorológicos.
 4. Ten en cuenta la propiedad "selectedSites" de las preferencias del usuario para priorizar la inclusión de esos sitios en el itinerario incluso si no están dentro de los datos filtrados.
 5. Usa null cuando un bloque del día no tenga una actividad adecuada.
-6. Responde únicamente con JSON válido, sin Markdown, sin comentarios y sin texto adicional.
-7. Mantén exactamente las claves, tipos y estructura de este esquema. No añadas, elimines ni renombres propiedades:
+6. Responde únicamente con JSON válido, sin Markdown y sin texto adicional. Mantén exactamente las claves, tipos y estructura de este esquema. No añadas, elimines ni renombres propiedades. La propiedad setting debe tener solo 3 valores posibles según el clima y la disponibilidad de eventos: "indoor", "outdoor" o "mixed".
 ${JSON.stringify(responseSchema, null, 2)}
 
 Cada actividad debe tener esta estructura cuando no sea null: {"title":"string","place":"string","reason":"string","setting":"string"}.`
@@ -566,7 +575,7 @@ function normalizeActivity(activity, fallbackActivity) {
     title: String(candidate.title ?? ''),
     place: String(candidate.place ?? ''),
     reason: String(candidate.reason ?? ''),
-    setting: String(candidate.setting ?? ''),
+    setting: normalizeSetting(candidate.setting, normalizeSetting(fallbackActivity?.setting)),
   }
 }
 
