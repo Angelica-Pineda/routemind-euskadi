@@ -1,15 +1,12 @@
 import pytest
+import tempfile
+import os
 import json
 from pyspark.sql import SparkSession
 from pyspark.sql import types as T
-import sys
-import os
-from pathlib import Path
 
-current_dir = "/Workspace" + os.path.dirname(dbutils.notebook.entry_point.getDbutils().notebook().getContext().notebookPath().get())
-data_architecture_path = str(Path(current_dir).parents[0])
-sys.path.append(data_architecture_path)
 
+# 'data_architecture' needs to be marked as source root
 from src.utils.cleaning_functions import (
     explode_array_column,
     extract_and_cast,
@@ -23,62 +20,70 @@ def spark():
     """Reutiliza la sesión activa de Spark en Databricks."""
     return SparkSession.builder.getOrCreate()
 
+#@pytest.fixture(scope="session")
+#def spark():
+    """Reutiliza la sesión activa de Spark en Databricks."""
+    return SparkSession.builder.getOrCreate()
+
 @pytest.fixture(scope="session")
 def mock_raw_df(spark):
     """
     Crete a mock Dataframe to be used in tests.
     sc.parallelize simulate the reading process of a JSON file.
     """
-    mock_json = """
-    {
-      "rows": {
-        "row": [
-          {
-            "documentName": "docname1",
-            "documentDescription": "Doc descrip 1",
-            "templateType": "temp type 1",
-            "phone": "333 000 555",
-            "address": "street,1",
-            "marks": "Bilbao",
-            "tourismEmail": "test@test.org",
-            "postalCode": 48008,
-            "latitudelongitude": "43.25731611140031,-2.9335773613769334",
-            "latwgs84": 43.257316111400307,
-            "lonwgs84": -2.9335773613769334,
-            "municipality": "Bilbao",
-            "municipalitycode": 20,
-            "territory": "Bizkaia",
-            "territorycode": 48,
-            "country": "España",
-            "countrycode": 108,
-            "@num": 1
-          },
-          {
-            "documentName": "docname2",
-            "documentDescription": "Doc descrip 2",
-            "phone": "444 111 555",
-            "address": "street,3",
-            "marks": "Vitoria-Gasteiz",
-            "tourismEmail": "", 
-            "postalCode": 48008,
-            "latwgs84": 43.257316111400307,
-            "lonwgs84": -2.9335773613769334,
-            "municipality": "Vitoria-Gasteiz",
-            "municipalitycode": 20,
-            "territory": "Araba",
-            "territorycode": 01,
-            "country": "España",
-            "countrycode": 108,
-            "@num": 2
-          }
-        ]
-      }
+    mock_dict = {
+        "rows": {
+            "row": [
+                {
+                    "documentName": "docname1",
+                    "documentDescription": "Doc descrip 1",
+                    "templateType": "temp type 1",
+                    "phone": "333 000 555",
+                    "address": "street,1",
+                    "marks": "Bilbao",
+                    "tourismEmail": "test@test.org",
+                    "postalCode": 48008,
+                    "latitudelongitude": "43.25731611140031,-2.9335773613769334",
+                    "latwgs84": 43.257316111400307,
+                    "lonwgs84": -2.9335773613769334,
+                    "municipality": "Bilbao",
+                    "municipalitycode": 20,
+                    "territory": "Bizkaia",
+                    "territorycode": 48,
+                    "country": "España",
+                    "countrycode": 108,
+                    "@num": 1
+                },
+                {
+                    "documentName": "docname2",
+                    "documentDescription": "Doc descrip 2",
+                    "phone": "444 111 555",
+                    "address": "street,3",
+                    "marks": "Vitoria-Gasteiz",
+                    "tourismEmail": "",
+                    "postalCode": 48008,
+                    "latwgs84": 43.257316111400307,
+                    "lonwgs84": -2.9335773613769334,
+                    "municipality": "Vitoria-Gasteiz",
+                    "municipalitycode": 20,
+                    "@num": 2
+                }
+            ]
+        }
     }
-    """
 
-    rdd = spark.sparkContext.parallelize([mock_json])
-    return spark.read.json(rdd)
+    with tempfile.NamedTemporaryFile(mode="w", delete=False, suffix=".json", encoding="utf-8") as tmp:
+        json.dump(mock_dict, tmp)
+        tmp_path = tmp.name
 
+    try:
+
+        df = spark.read.option("multiline", "true").json(tmp_path)
+        yield df
+
+    finally:
+        if os.path.exists(tmp_path):
+            os.remove(tmp_path)
 
 # --- UNIT TESTS USING MOCKS ---
 
