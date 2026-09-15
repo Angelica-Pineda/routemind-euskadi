@@ -17,13 +17,9 @@ from src.utils.cleaning_functions import (
 
 @pytest.fixture(scope="session")
 def spark():
-    """Reutiliza la sesión activa de Spark en Databricks."""
+    """Reuse active Spark session in Databricks."""
     return SparkSession.builder.getOrCreate()
 
-#@pytest.fixture(scope="session")
-#def spark():
-    """Reutiliza la sesión activa de Spark en Databricks."""
-    return SparkSession.builder.getOrCreate()
 
 @pytest.fixture(scope="session")
 def mock_raw_df(spark):
