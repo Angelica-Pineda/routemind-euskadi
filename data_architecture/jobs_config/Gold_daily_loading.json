@@ -1,0 +1,46 @@
+{
+  "name": "Gold_daily_loading",
+  "email_notifications": {
+    "no_alert_for_skipped_runs": false
+  },
+  "webhook_notifications": {},
+  "timeout_seconds": 0,
+  "schedule": {
+    "quartz_cron_expression": "18 0 15 * * ?",
+    "timezone_id": "Europe/Madrid",
+    "pause_status": "PAUSED"
+  },
+  "max_concurrent_runs": 1,
+  "tasks": [
+    {
+      "task_key": "daily_events",
+      "run_if": "ALL_SUCCESS",
+      "notebook_task": {
+        "notebook_path": "/Workspace/Users/jepineda@ucm.es/routemind-euskadi/data_architecture/src/layers/gold/events_to_gold",
+        "source": "WORKSPACE"
+      },
+      "existing_cluster_id": "0809-192903-w5dk95a8",
+      "timeout_seconds": 0,
+      "email_notifications": {},
+      "webhook_notifications": {},
+      "disabled": false
+    },
+    {
+      "task_key": "daily_inference_weather_prob",
+      "run_if": "ALL_SUCCESS",
+      "notebook_task": {
+        "notebook_path": "/Workspace/Users/jepineda@ucm.es/routemind-euskadi/data_architecture/src/layers/gold/ML/daily_inference_weather_prob",
+        "source": "WORKSPACE"
+      },
+      "existing_cluster_id": "0809-192903-w5dk95a8",
+      "timeout_seconds": 0,
+      "email_notifications": {},
+      "webhook_notifications": {},
+      "disabled": false
+    }
+  ],
+  "queue": {
+    "enabled": true
+  },
+  "performance_target": "PERFORMANCE_OPTIMIZED"
+}

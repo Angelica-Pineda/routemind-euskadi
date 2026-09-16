@@ -1,0 +1,116 @@
+{
+  "name": "Bronze_quarterly_loading",
+  "email_notifications": {
+    "no_alert_for_skipped_runs": false
+  },
+  "webhook_notifications": {},
+  "timeout_seconds": 0,
+  "schedule": {
+    "quartz_cron_expression": "0 0 13 1 1/3 ?",
+    "timezone_id": "Europe/Madrid",
+    "pause_status": "PAUSED"
+  },
+  "max_concurrent_runs": 1,
+  "tasks": [
+    {
+      "task_key": "air_quality_stations",
+      "run_if": "ALL_SUCCESS",
+      "notebook_task": {
+        "notebook_path": "/Workspace/Users/jepineda@ucm.es/routemind-euskadi/data_architecture/src/layers/bronze/air_quality_landing_to_bronze",
+        "base_parameters": {
+          "file_name": "air_quality_stations"
+        },
+        "source": "WORKSPACE"
+      },
+      "existing_cluster_id": "0809-192903-w5dk95a8",
+      "timeout_seconds": 0,
+      "email_notifications": {},
+      "webhook_notifications": {},
+      "disabled": false
+    },
+    {
+      "task_key": "cultural_buildings",
+      "run_if": "ALL_SUCCESS",
+      "notebook_task": {
+        "notebook_path": "/Workspace/Users/jepineda@ucm.es/routemind-euskadi/data_architecture/src/layers/bronze/cultural_buildings_landing_to_bronze",
+        "base_parameters": {
+          "file_name": "cultural_buildings"
+        },
+        "source": "WORKSPACE"
+      },
+      "existing_cluster_id": "0809-192903-w5dk95a8",
+      "timeout_seconds": 0,
+      "email_notifications": {},
+      "webhook_notifications": {},
+      "disabled": false
+    },
+    {
+      "task_key": "cultural_places",
+      "run_if": "ALL_SUCCESS",
+      "notebook_task": {
+        "notebook_path": "/Workspace/Users/jepineda@ucm.es/routemind-euskadi/data_architecture/src/layers/bronze/cultural_places_landing_to_bronze",
+        "base_parameters": {
+          "file_name": "cultural_places"
+        },
+        "source": "WORKSPACE"
+      },
+      "existing_cluster_id": "0809-192903-w5dk95a8",
+      "timeout_seconds": 0,
+      "email_notifications": {},
+      "webhook_notifications": {},
+      "disabled": false
+    },
+    {
+      "task_key": "natural_places",
+      "run_if": "ALL_SUCCESS",
+      "notebook_task": {
+        "notebook_path": "/Workspace/Users/jepineda@ucm.es/routemind-euskadi/data_architecture/src/layers/bronze/natural_places_landing_to_bronze",
+        "base_parameters": {
+          "file_name": "natural_places"
+        },
+        "source": "WORKSPACE"
+      },
+      "existing_cluster_id": "0809-192903-w5dk95a8",
+      "timeout_seconds": 0,
+      "email_notifications": {},
+      "webhook_notifications": {},
+      "disabled": false
+    },
+    {
+      "task_key": "restaurants",
+      "run_if": "ALL_SUCCESS",
+      "notebook_task": {
+        "notebook_path": "/Workspace/Users/jepineda@ucm.es/routemind-euskadi/data_architecture/src/layers/bronze/restaurants_landing_to_bronze",
+        "base_parameters": {
+          "file_name": "restaurant"
+        },
+        "source": "WORKSPACE"
+      },
+      "existing_cluster_id": "0809-192903-w5dk95a8",
+      "timeout_seconds": 0,
+      "email_notifications": {},
+      "webhook_notifications": {},
+      "disabled": false
+    },
+    {
+      "task_key": "weather_stations",
+      "run_if": "ALL_SUCCESS",
+      "notebook_task": {
+        "notebook_path": "/Workspace/Users/jepineda@ucm.es/routemind-euskadi/data_architecture/src/layers/bronze/weather_landing_to_bronze",
+        "base_parameters": {
+          "file_name": "weather_stations"
+        },
+        "source": "WORKSPACE"
+      },
+      "existing_cluster_id": "0809-192903-w5dk95a8",
+      "timeout_seconds": 0,
+      "email_notifications": {},
+      "webhook_notifications": {},
+      "disabled": false
+    }
+  ],
+  "queue": {
+    "enabled": true
+  },
+  "performance_target": "PERFORMANCE_OPTIMIZED"
+}
